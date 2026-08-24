@@ -113,7 +113,7 @@ export interface Party {
   variants: string[];
   foundedAt?: string;
   dissolvedAt?: string | null;
-  status: "active" | "historical" | "coalition" | "movement";
+  status: "active" | "historical" | "coalition" | "movement" | "association" | "organization";
   description: string;
   historicalNote: string;
   families: string[];
