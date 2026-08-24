@@ -677,5 +677,384 @@ export const sources: Source[] = [
     type: "source_secondaire",
     accessDate: "2026-08-24",
     notes: "Source partisane à croiser avec sources archivistiques."
+  },
+  {
+    id: "source-vie-publique-mitterrand-1981",
+    title: "L'élection présidentielle de 1981",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/fiches/19553-lelection-presidentielle-de-1981",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-cohabitation-1986",
+    title: "La première cohabitation (1986-1988)",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/fiches/19554-la-premiere-cohabitation-1986-1988",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-decentralisation",
+    title: "Les lois de décentralisation de 1982-1983",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/eclairage/38447-les-lois-de-decentralisation-de-1982-1983",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-assemblee-legislatives-1988",
+    title: "Les élections législatives sous la Ve République",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/les-elections-legislatives",
+    type: "institution",
+    accessDate: "2026-08-24",
+    notes: "Source institutionnelle de cadrage ; les résultats détaillés devront être rapprochés des données électorales officielles."
+  },
+  {
+    id: "source-francearchives-verts",
+    title: "Les Verts (France ; 1984-2010)",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à préciser ; utilisée ici pour le cadrage de la formation écologiste."
+  },
+  {
+    id: "source-fondation-jean-jaures-fn-1984",
+    title: "La percée électorale du Front national dans les années 1980",
+    publisher: "Fondation Jean-Jaurès",
+    url: "https://www.jean-jaures.org/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage ; ne remplace pas une table officielle pour les pourcentages et sièges."
+  },
+  {
+    id: "source-maitron-parti-travailleurs",
+    title: "Parti des travailleurs et courant lambertiste",
+    publisher: "Le Maitron",
+    url: "https://maitron.fr/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage historique pour une organisation dont la chronologie et les appellations évoluent."
+  },
+  {
+    id: "source-parti-occitan-1987",
+    title: "Histoire du Parti occitan",
+    publisher: "Parti occitan",
+    url: "https://partitoccitan.org/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source partisane à croiser avec des travaux universitaires."
+  },
+  {
+    id: "source-cuncolta-naziunale",
+    title: "A Cuncolta Naziunale",
+    publisher: "Encyclopédie de la Corse",
+    url: "https://www.encyclopedie.corsica/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage provisoire pour le mouvement autonomiste corse."
+  },
+  {
+    id: "source-choisir-feminisme",
+    title: "Histoire de Choisir - la cause des femmes",
+    publisher: "Choisir - la cause des femmes",
+    url: "https://choisirlacausedesfemmes.org/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source associative et partisane au sens large ; utilisée pour qualifier le mouvement féministe."
+  },
+  {
+    id: "source-vie-publique-maastricht",
+    title: "Le traité de Maastricht",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/eclairage/19387-le-traite-de-maastricht",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-gauche-plurielle",
+    title: "La gauche plurielle (1997-2002)",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24",
+    notes: "Source institutionnelle de cadrage ; les résultats et la composition détaillée seront à préciser."
+  },
+  {
+    id: "source-vie-publique-chirac-1995",
+    title: "L'élection présidentielle de 1995",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-francearchives-mdc",
+    title: "Mouvement des citoyens",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à compléter ; utilisée pour le cadrage du MDC et de sa filiation chevènementiste."
+  },
+  {
+    id: "source-francearchives-rpf-1999",
+    title: "Rassemblement pour la France",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à compléter ; le RPF de 1999 est distinct du RPF gaulliste de 1947."
+  },
+  {
+    id: "source-francearchives-mpf",
+    title: "Mouvement pour la France",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-francearchives-cpnt",
+    title: "Chasse, pêche, nature et traditions",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage provisoire pour une formation représentant des intérêts ruraux et cynégétiques."
+  },
+  {
+    id: "source-francearchives-mnr",
+    title: "Mouvement national républicain",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à compléter pour la scission du FN en 1998-1999."
+  },
+  {
+    id: "source-francearchives-democratie-liberale",
+    title: "Démocratie libérale",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage provisoire pour la formation libérale issue de l'UDF."
+  },
+  {
+    id: "source-francearchives-1990s-elections",
+    title: "Archives électorales de la Ve République",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/les-elections-legislatives",
+    type: "institution",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage ; les résultats chiffrés restent volontairement à compléter dans les fiches d'élections."
+  },
+  {
+    id: "source-vie-publique-presidentielle-2002",
+    title: "L'élection présidentielle de 2002",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24",
+    notes: "Source institutionnelle de cadrage ; les résultats détaillés doivent être rapprochés des données électorales officielles."
+  },
+  {
+    id: "source-vie-publique-presidentielle-2007",
+    title: "L'élection présidentielle de 2007",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-ump",
+    title: "Union pour un mouvement populaire",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage institutionnelle pour la création de l'UMP et la majorité présidentielle."
+  },
+  {
+    id: "source-francearchives-modem",
+    title: "Mouvement démocrate",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à compléter pour la transformation de l'UDF en MoDem."
+  },
+  {
+    id: "source-francearchives-npa",
+    title: "Nouveau Parti anticapitaliste",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage provisoire pour la création du NPA en 2009."
+  },
+  {
+    id: "source-francearchives-mrc",
+    title: "Mouvement républicain et citoyen",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-francearchives-front-gauche",
+    title: "Front de gauche",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage provisoire pour l'alliance constituée en 2008-2009."
+  },
+  {
+    id: "source-europe-ecologie-2009",
+    title: "Europe Écologie aux élections européennes de 2009",
+    publisher: "Fondation de l'écologie politique",
+    url: "https://www.fondationecolo.org/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage ; les résultats chiffrés doivent être vérifiés auprès des résultats électoraux officiels."
+  },
+  {
+    id: "source-francearchives-eelv",
+    title: "Europe Écologie Les Verts",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-attac-histoire",
+    title: "Histoire et statuts d'ATTAC",
+    publisher: "ATTAC France",
+    url: "https://france.attac.org/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source associative à croiser avec des travaux sur l'altermondialisme."
+  },
+  {
+    id: "source-vie-publique-hollande-2012",
+    title: "L'élection présidentielle de 2012",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-macron-2017",
+    title: "L'élection présidentielle de 2017",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-mariage-tous",
+    title: "La loi ouvrant le mariage aux couples de même sexe",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-vie-publique-gilets-jaunes",
+    title: "Le mouvement des Gilets jaunes",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-francearchives-lfi",
+    title: "La France insoumise",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à compléter pour un mouvement créé en 2016."
+  },
+  {
+    id: "source-francearchives-lrem",
+    title: "La République en marche",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Notice archivistique à compléter pour le mouvement créé en 2016."
+  },
+  {
+    id: "source-francearchives-lr",
+    title: "Les Républicains",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-francearchives-dlf",
+    title: "Debout la France",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-upr-histoire",
+    title: "Union populaire républicaine",
+    publisher: "Union populaire républicaine",
+    url: "https://www.upr.fr/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source partisane à croiser avec des sources institutionnelles."
+  },
+  {
+    id: "source-francearchives-rn",
+    title: "Rassemblement national et Front national",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Source de cadrage pour le changement de nom du FN en RN en 2018."
+  },
+  {
+    id: "source-parti-animaliste",
+    title: "Parti animaliste",
+    publisher: "Parti animaliste",
+    url: "https://parti-animaliste.fr/",
+    type: "source_secondaire",
+    accessDate: "2026-08-24",
+    notes: "Source partisane à croiser avec les résultats électoraux officiels."
+  },
+  {
+    id: "source-francearchives-parti-animaliste",
+    title: "Partis et listes des élections européennes de 2019",
+    publisher: "Ministère de l'Intérieur",
+    url: "https://www.interieur.gouv.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
+  },
+  {
+    id: "source-francearchives-nupes",
+    title: "Nouvelle Union populaire écologique et sociale",
+    publisher: "FranceArchives",
+    url: "https://francearchives.gouv.fr/",
+    type: "archive",
+    accessDate: "2026-08-24",
+    notes: "Coalition postérieure à la période 2010-2020 ; entrée conservée comme repère de continuité."
+  },
+  {
+    id: "source-vie-publique-covid-2020",
+    title: "La crise sanitaire de 2020",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/",
+    type: "institution",
+    accessDate: "2026-08-24"
   }
 ];
