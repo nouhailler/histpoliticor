@@ -1,0 +1,17 @@
+{
+  "name": "HistPoliticor",
+  "short_name": "HistPoliticor",
+  "description": "Histoire documentaire des partis politiques français depuis 1900.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f0e6",
+  "theme_color": "#2f3a35",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

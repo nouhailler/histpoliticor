@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="HistPoliticor">
+  <rect width="512" height="512" rx="96" fill="#2f3a35"/>
+  <path d="M128 118h196c44 0 72 28 72 66v210H176c-30 0-48-18-48-48V118Z" fill="#f5f0e6"/>
+  <path d="M176 118v276M224 178h112M224 238h112M224 298h84" stroke="#8f3f2f" stroke-width="24" stroke-linecap="round"/>
+</svg>
