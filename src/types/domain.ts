@@ -51,6 +51,16 @@ export type EventCategory =
   | "evenement_social"
   | "evenement_economique";
 
+export type CrisisType =
+  | "partisane"
+  | "politique_institutionnelle"
+  | "economique_financiere"
+  | "sociale"
+  | "internationale_militaire"
+  | "sanitaire"
+  | "environnementale"
+  | "territoriale_outre_mer";
+
 export interface Source {
   id: string;
   title: string;
@@ -142,11 +152,14 @@ export interface Event {
   id: string;
   date: string;
   endDate?: string;
+  ongoing?: boolean;
   period: string;
   regime: string;
   title: string;
   description: string;
   category: EventCategory;
+  crisisType?: CrisisType;
+  consequences?: string;
   importance: 1 | 2 | 3 | 4 | 5;
   parties: string[];
   persons: string[];

@@ -18,3 +18,5 @@ Hiérarchie de sources privilégiée :
 Les sources partisanes peuvent documenter une position revendiquée ou un repère interne, mais doivent être contextualisées et croisées dès que possible.
 
 Les images ne doivent pas être ajoutées depuis une recherche générale sans auteur, source, date, licence, crédit, URL et statut des droits.
+
+Les logos de partis sont importés uniquement depuis Wikimedia Commons lorsqu'un fichier libre et une identification non ambiguë sont disponibles. Les fichiers sont servis localement ; leur page source, leur auteur et leur licence sont conservés dans `src/data/partyLogos.ts` et affichés sur la page des partis. Les droits de marque éventuels restent distincts de la licence du fichier.

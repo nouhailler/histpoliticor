@@ -60,7 +60,7 @@ main { width: min(1120px, 100%); margin: 0 auto; padding: 18px 14px 36px; }
 h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.15rem, 7vw, 4.8rem); line-height: 0.98; margin: 0 0 14px; letter-spacing: 0; }
 h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .hero p { max-width: 58rem; font-size: 1.08rem; line-height: 1.55; }
-.hero-actions, .chips, .filter-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-actions, .chips, .filter-row, .segmented-filter { display: flex; gap: 10px; flex-wrap: wrap; }
 .hero-actions button, .wide-action, .chips button {
   min-height: 46px;
   border: 1px solid var(--green);
@@ -107,20 +107,168 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
   padding: 0 12px;
   color: var(--ink);
 }
-.timeline { list-style: none; padding: 0; margin: 20px 0 0; border-left: 3px solid var(--gold); }
-.timeline li { margin: 0 0 12px 12px; }
-.timeline button {
-  width: 100%;
+.segmented-filter { margin-bottom: 10px; }
+.segmented-filter button {
+  min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fffaf1;
+  color: var(--green);
+  padding: 0 12px;
+  font-weight: 750;
+}
+.segmented-filter button.active {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+.timeline { list-style: none; padding: 0; margin: 20px 0 0; border-left: 3px solid var(--gold); }
+.timeline li {
+  margin: 0 0 10px 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffaf1;
+}
+.timeline .timeline-summary {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   padding: 14px;
   text-align: left;
 }
-.timeline time { display: block; color: var(--oxide); font-weight: 800; margin-bottom: 6px; }
+.timeline .timeline-summary:hover { background: var(--paper); }
+.timeline .timeline-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+}
+.timeline .timeline-date-row svg { flex: 0 0 auto; color: var(--oxide); transition: transform 160ms ease; }
+.timeline li.open .timeline-date-row svg { transform: rotate(180deg); }
+.timeline time { display: block; color: var(--oxide); font-weight: 800; }
 .timeline span { display: block; color: var(--muted); margin-top: 5px; }
+.timeline .timeline-meta {
+  color: var(--blue);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+.timeline .timeline-summary > strong { display: block; margin-top: 3px; }
+.timeline-panel { border-top: 1px solid var(--line); padding: 12px 14px 14px; }
+.timeline-panel > p { margin: 0; color: #3b423d; line-height: 1.55; }
+.timeline .timeline-links, .timeline .timeline-context {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  color: #3b423d;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.timeline .timeline-context {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.timeline .timeline-links b, .timeline .timeline-context b { color: var(--ink); }
+.timeline .timeline-full-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  margin-top: 14px;
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  background: var(--green);
+  color: white;
+  padding: 10px 12px;
+  font-weight: 750;
+}
+.empty-state { color: var(--muted); margin-top: 18px; }
+
+.timeline-context-section > dl {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.timeline-context-section > dl > div {
+  display: grid;
+  grid-template-columns: minmax(145px, 0.35fr) 1fr;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #fffdf8;
+}
+.timeline-context-section > dl > div + div { border-top: 1px solid var(--line); }
+.timeline-context-section dt { color: var(--blue); font-weight: 800; }
+.timeline-context-section dd { margin: 0; }
+.timeline-context-section .chips { margin-top: 0; }
+.context-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 8px 10px;
+}
+.empty-context { color: var(--muted); font-style: italic; }
+
+@media (max-width: 560px) {
+  .timeline-context-section > dl > div { grid-template-columns: 1fr; gap: 7px; }
+}
 
 .entity-card { width: 100%; min-height: 138px; }
+.party-card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 154px;
+}
+.party-logo {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+.party-logo img { display: block; width: 76px; height: 76px; object-fit: contain; }
+.entity-card .party-monogram {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 8px;
+  color: var(--green);
+  background: linear-gradient(145deg, #fffdf8, var(--paper-deep));
+  font-size: 0.84rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.party-card-copy { min-width: 0; margin: 0; }
+.entity-card .party-acronym { margin: 0; }
+.party-card-copy strong { margin: 5px 0 7px; }
+.logo-credits {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffaf1;
+}
+.logo-credits summary { cursor: pointer; color: var(--green); font-weight: 800; }
+.logo-credits p { color: var(--muted); line-height: 1.5; }
+.logo-credits ul { margin-bottom: 0; padding-left: 20px; line-height: 1.6; }
 .source-card h2 { margin-top: 8px; }
 .detail { margin-top: 10px; }
 .detail-heading { display: grid; gap: 8px; margin-bottom: 18px; }
@@ -129,6 +277,9 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .fact-grid dt { color: var(--muted); font-size: 0.82rem; }
 .fact-grid dd { margin: 4px 0 0; font-weight: 750; }
 .method-note, .status { border-left: 4px solid var(--gold); padding: 10px 12px; background: var(--paper); }
+.event-consequences { margin: 18px 0; border-left: 4px solid var(--oxide); padding: 10px 14px; background: var(--paper); }
+.event-consequences h2 { margin: 0 0 6px; font-size: 1rem; }
+.event-consequences p { margin: 0; }
 .linked-section { margin-top: 22px; }
 .source-list { padding-left: 18px; line-height: 1.6; }
 .relation-row { display: block; width: 100%; margin-bottom: 10px; }

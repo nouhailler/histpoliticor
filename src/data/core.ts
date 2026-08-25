@@ -9,6 +9,7 @@ export const regimes: Regime[] = [
 ];
 
 export const periods: Period[] = [
+  { id: "period-1880-1899", name: "1880-1899", start: "1880", end: "1899", regime: "regime-troisieme-republique", description: "Consolidation de la IIIe République, structuration du mouvement ouvrier et crise boulangiste puis affaire Dreyfus." },
   { id: "period-1900-1914", name: "1900-1914", start: "1900", end: "1914", regime: "regime-troisieme-republique", description: "Consolidation républicaine, recompositions radicales et socialistes." },
   { id: "period-1914-1918", name: "1914-1918", start: "1914", end: "1918", regime: "regime-troisieme-republique", description: "Première Guerre mondiale et Union sacrée." },
   { id: "period-1919-1932", name: "1919-1932", start: "1919", end: "1932", regime: "regime-troisieme-republique", description: "Après-guerre, scission socialiste et structuration communiste." },
@@ -4423,7 +4424,7 @@ export const events: Event[] = [
   {
     id: "event-creation-action-francaise",
     date: "1899",
-    period: "period-1900-1914",
+    period: "period-1880-1899",
     regime: "regime-troisieme-republique",
     title: "Naissance de l'Action française",
     description: "Le mouvement apparaît dans le contexte de l'affaire Dreyfus et évolue vers un nationalisme monarchiste.",
@@ -4438,7 +4439,7 @@ export const events: Event[] = [
   {
     id: "event-creation-ligue-des-patriotes",
     date: "1882",
-    period: "period-1900-1914",
+    period: "period-1880-1899",
     regime: "regime-troisieme-republique",
     title: "Fondation de la Ligue des patriotes",
     description: "Paul Déroulède fonde une ligue nationaliste initialement tournée vers le thème de la revanche.",
@@ -4899,6 +4900,22 @@ export const events: Event[] = [
     persons: ["person-maurice-thorez"],
     elections: [],
     sources: ["source-pcf-histoire"],
+    dataStatus: "partially_verified"
+  },
+  {
+    id: "event-seconde-guerre-mondiale",
+    date: "1939-09-03",
+    endDate: "1945-05-08",
+    period: "period-1939-1945",
+    regime: "regime-vichy",
+    title: "Seconde Guerre mondiale, Occupation et crise de l'État",
+    description: "La guerre, la défaite de 1940, l'Occupation et le régime de Vichy constituent une crise majeure qui bouleverse les partis, les institutions, la Résistance et les recompositions de la Libération.",
+    category: "guerre",
+    importance: 5,
+    parties: ["party-pcf", "party-sfio", "party-prrrs", "party-ard", "party-federation-republicaine", "party-pdp", "party-mrp"],
+    persons: ["person-charles-de-gaulle", "person-philippe-petain", "person-paul-reynaud"],
+    elections: [],
+    sources: ["source-vie-publique-vichy-resistance", "source-assemblee-pleins-pouvoirs-1940"],
     dataStatus: "partially_verified"
   },
   {

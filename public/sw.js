@@ -1,4 +1,4 @@
-const CACHE_NAME = "histpoliticor-v1";
+const CACHE_NAME = "histpoliticor-v2";
 const CORE_ASSETS = ["/", "/index.html", "/manifest.webmanifest", "/offline.html", "/icons/icon.svg"];
 
 self.addEventListener("install", (event) => {

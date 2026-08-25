@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { dataset } from ".";
+import { partyLogos } from "./partyLogos";
 import { relatedEventsFor, relatedRelationsFor } from "../lib/entity";
 
 describe("dataset navigation requirements", () => {
@@ -18,5 +21,46 @@ describe("dataset navigation requirements", () => {
 
   it("finds events attached to Leon Blum", () => {
     expect(relatedEventsFor("person-leon-blum").map((event) => event.id)).toContain("event-front-populaire-1936");
+  });
+
+  it("exposes corrected crisis context and consequences", () => {
+    const smeCrisis = dataset.events.find((event) => event.id === "event-crise-sme-1992");
+    const may1968 = dataset.events.find((event) => event.id === "event-mai-68");
+
+    expect(smeCrisis?.crisisType).toBe("economique_financiere");
+    expect(smeCrisis?.consequences).toContain("Il ne s'agit pas d'une dévaluation française en 1993");
+    expect(may1968?.crisisType).toBe("sociale");
+    expect(may1968?.consequences).toContain("accords de Grenelle");
+  });
+
+  it("covers major political, military, sanitary and environmental crises through 2026", () => {
+    const ids = new Set(dataset.events.map((event) => event.id));
+
+    expect(ids).toContain("event-affaire-dreyfus");
+    expect(ids).toContain("event-guerre-indochine");
+    expect(ids).toContain("event-canicule-2003");
+    expect(ids).toContain("event-crise-nouvelle-caledonie-2024");
+    expect(ids).toContain("event-censure-barnier-2024");
+    expect(ids).toContain("event-chute-gouvernement-bayrou-2025");
+    expect(ids).toContain("event-canicule-juin-2026");
+  });
+
+  it("documents consequences for every typed crisis", () => {
+    const incomplete = dataset.events.filter((event) => event.crisisType && !event.consequences?.trim());
+    expect(incomplete).toEqual([]);
+  });
+
+  it("keeps every imported party logo local, attributed and attached to a known party", () => {
+    const partyIds = new Set(dataset.parties.map((party) => party.id));
+    const entries = Object.entries(partyLogos);
+
+    expect(entries.length).toBeGreaterThanOrEqual(50);
+    for (const [partyId, logo] of entries) {
+      expect(partyIds.has(partyId)).toBe(true);
+      expect(existsSync(path.resolve("public", logo.path.replace(/^\//, "")))).toBe(true);
+      expect(logo.sourceUrl).toContain("commons.wikimedia.org/wiki/File:");
+      expect(logo.author.trim()).not.toBe("");
+      expect(logo.license.trim()).not.toBe("");
+    }
   });
 });

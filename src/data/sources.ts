@@ -357,6 +357,14 @@ export const sources: Source[] = [
     accessDate: "2026-08-24"
   },
   {
+    id: "source-vie-publique-vichy-resistance",
+    title: "Vichy et la Résistance (1940-1944) : deux légitimités concurrentes",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/fiches/268978-regime-de-vichy-et-resistance-1940-1944",
+    type: "institution",
+    accessDate: "2026-08-25"
+  },
+  {
     id: "source-francearchives-mrp",
     title: "Mouvement républicain populaire (France ; 1944-1967)",
     publisher: "FranceArchives",

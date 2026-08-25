@@ -1,7 +1,15 @@
 import { documents } from "./documents";
-import { elections, events, families, parties, periods, persons, regimes, relations } from "./core";
-import { sources } from "./sources";
+import { elections, events as coreEvents, families, parties, periods, persons, regimes, relations } from "./core";
+import { crisisEvents, crisisMetadata, crisisSources } from "./crises";
+import { sources as coreSources } from "./sources";
 import type { Dataset } from "../types/domain";
+
+const events = [
+  ...coreEvents.map((event) => ({ ...event, ...crisisMetadata[event.id] })),
+  ...crisisEvents
+];
+
+const sources = [...coreSources, ...crisisSources];
 
 export const dataset: Dataset = {
   sources,
