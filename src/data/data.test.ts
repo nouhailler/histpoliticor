@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { dataset } from ".";
 import { partyLogos } from "./partyLogos";
+import { personPortraits } from "./personPortraits";
 import { relatedEventsFor, relatedRelationsFor } from "../lib/entity";
 
 describe("dataset navigation requirements", () => {
@@ -61,6 +62,21 @@ describe("dataset navigation requirements", () => {
       expect(logo.sourceUrl).toContain("commons.wikimedia.org/wiki/File:");
       expect(logo.author.trim()).not.toBe("");
       expect(logo.license.trim()).not.toBe("");
+    }
+  });
+
+  it("keeps imported person portraits local, attributed and attached to a known person", () => {
+    const personIds = new Set(dataset.persons.map((person) => person.id));
+    const entries = Object.entries(personPortraits);
+
+    expect(entries.length).toBeGreaterThanOrEqual(130);
+    for (const [personId, portrait] of entries) {
+      expect(personIds.has(personId)).toBe(true);
+      expect(existsSync(path.resolve("public", portrait.path.replace(/^\//, "")))).toBe(true);
+      expect(portrait.wikipediaUrl).toContain("fr.wikipedia.org/wiki/");
+      expect(portrait.sourceUrl).toContain("commons.wikimedia.org/wiki/File:");
+      expect(portrait.author.trim()).not.toBe("");
+      expect(portrait.license.trim()).not.toBe("");
     }
   });
 });

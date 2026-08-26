@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
     "validate:data": "tsx scripts/validate-data.ts",
-    "fetch:party-logos": "tsx scripts/fetch-party-logos.ts"
+    "fetch:party-logos": "tsx scripts/fetch-party-logos.ts",
+    "fetch:person-portraits": "tsx scripts/fetch-person-portraits.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",

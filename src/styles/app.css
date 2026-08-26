@@ -259,6 +259,39 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .party-card-copy { min-width: 0; margin: 0; }
 .entity-card .party-acronym { margin: 0; }
 .party-card-copy strong { margin: 5px 0 7px; }
+.person-card {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 154px;
+}
+.person-portrait-thumb {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 104px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+.person-portrait-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.person-card-copy { min-width: 0; margin: 0; }
+.entity-card .person-dates { margin: 0; }
+.person-card-copy strong { margin: 5px 0 7px; }
+.person-monogram {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--green);
+  background: linear-gradient(145deg, #fffdf8, var(--paper-deep));
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+}
 .logo-credits {
   margin-top: 24px;
   padding: 14px 16px;
@@ -272,6 +305,21 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .source-card h2 { margin-top: 8px; }
 .detail { margin-top: 10px; }
 .detail-heading { display: grid; gap: 8px; margin-bottom: 18px; }
+.person-profile { display: grid; gap: 18px; align-items: start; }
+.person-portrait {
+  width: min(270px, 100%);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+.person-portrait > img { display: block; width: 100%; max-height: 360px; object-fit: cover; object-position: center top; }
+.person-portrait > .person-monogram { min-height: 280px; font-size: 4rem; }
+.person-portrait figcaption { display: grid; gap: 4px; padding: 10px 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.74rem; line-height: 1.35; }
+.person-portrait figcaption span { display: block; overflow-wrap: anywhere; }
+.person-biography { min-width: 0; }
+.person-biography > p { margin-top: 0; }
 .fact-grid { display: grid; gap: 10px; margin: 18px 0; }
 .fact-grid div { padding: 12px; border: 1px solid var(--line); background: var(--paper); border-radius: 8px; }
 .fact-grid dt { color: var(--muted); font-size: 0.82rem; }
@@ -321,6 +369,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .hero { grid-template-columns: 1.2fr 0.8fr; min-height: 72vh; }
   .discovery-grid, .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .person-profile { grid-template-columns: minmax(210px, 270px) minmax(0, 1fr); }
   .bottom-nav {
     position: sticky;
     top: 66px;

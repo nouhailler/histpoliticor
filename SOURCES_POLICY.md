@@ -20,3 +20,5 @@ Les sources partisanes peuvent documenter une position revendiquée ou un repèr
 Les images ne doivent pas être ajoutées depuis une recherche générale sans auteur, source, date, licence, crédit, URL et statut des droits.
 
 Les logos de partis sont importés uniquement depuis Wikimedia Commons lorsqu'un fichier libre et une identification non ambiguë sont disponibles. Les fichiers sont servis localement ; leur page source, leur auteur et leur licence sont conservés dans `src/data/partyLogos.ts` et affichés sur la page des partis. Les droits de marque éventuels restent distincts de la licence du fichier.
+
+Les portraits de personnalités proviennent des images de référence associées par Wikidata aux notices Wikipédia. Le rapprochement utilise le nom et la date de naissance lorsqu'elle est disponible. Seuls les fichiers Wikimedia Commons avec une licence libre reconnue sont conservés localement ; la notice Wikipédia, la page Commons, l'auteur et la licence sont affichés sur la fiche.

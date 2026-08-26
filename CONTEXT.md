@@ -10,7 +10,7 @@ Le projet est hébergé sur GitHub :
 
 ## État du corpus
 
-Le dataset est local. Au 25 août 2026, il contient 107 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 157 sources. Les périodes déjà structurées comprennent notamment :
+Le dataset est local. Au 26 août 2026, il contient 107 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 157 sources. Les périodes déjà structurées comprennent notamment :
 
 - 1880-1899 : consolidation républicaine, mouvement ouvrier, boulangisme et affaire Dreyfus ;
 - IIIe République : radicalisme, républicains modérés, socialismes, SFIO, ligues et Front populaire ;
@@ -30,10 +30,13 @@ Les coalitions et associations sont modélisées comme telles. Une coalition ne 
 - `src/data/sources.ts` contient les références documentaires ;
 - `src/data/documents.ts` contient les documents et textes politiques ;
 - `src/data/partyLogos.ts` est le manifeste généré des logos, auteurs et licences ;
+- `src/data/personPortraits.ts` est le manifeste généré des portraits, articles Wikipédia, auteurs et licences ;
 - `src/types/domain.ts` définit les contrats TypeScript du domaine ;
 - `scripts/validate-data.ts` vérifie la cohérence du corpus ;
 - `scripts/fetch-party-logos.ts` recherche, contrôle et télécharge la sélection de logos Wikimedia Commons ;
+- `scripts/fetch-person-portraits.ts` rapproche les personnes avec Wikidata et télécharge les portraits libres de Wikimedia Commons ;
 - `public/logos/parties` contient les 52 fichiers de logos servis localement ;
+- `public/images/persons` contient les 139 portraits servis localement ;
 - `src/data/data.test.ts` contient les tests de cohérence du corpus et des logos.
 
 Les relations sont des objets de données à part entière. Elles utilisent notamment `FOUNDED_FROM`, `SPLIT_FROM`, `MERGED_INTO`, `RENAMED_TO`, `SUCCESSOR_OF`, `ALLIED_WITH` et `FOUNDED_BY`.
@@ -56,6 +59,16 @@ npm run fetch:party-logos -- --download
 
 Le script vérifie une licence libre reconnue, télécharge une miniature locale et régénère `src/data/partyLogos.ts`. Les éventuels droits de marque restent distincts de la licence du fichier.
 
+## Portraits
+
+Les cartes et les fiches « Personnalités » utilisent l'un des 139 portraits locaux lorsqu'une correspondance Wikidata fiable a été établie avec le nom et, lorsqu'elle est disponible, la date de naissance. La fiche affiche l'auteur, la licence, la page du fichier Commons et la notice Wikipédia. Les cas ambigus ou sans image libre utilisent un monogramme.
+
+L'import est reproductible avec :
+
+```bash
+npm run fetch:person-portraits -- --download
+```
+
 ## Règles éditoriales
 
 1. Toute date précise, résultat électoral, citation ou filiation doit être relié à une source identifiable.
@@ -65,6 +78,7 @@ Le script vérifie une licence libre reconnue, télécharge une miniature locale
 5. Signaler les corrections historiques dans `historicalNote`, notamment lorsqu'une liste utilisateur contient un anachronisme ou une attribution incertaine.
 6. Préserver les fiches existantes et leurs sources lors d'une extension. Les relations nouvelles doivent décrire une transformation historique réelle.
 7. Ne jamais associer un logo sur la seule base d'un sigle ou d'un nom ambigu ; conserver sa page Commons, son auteur et sa licence.
+8. Pour un portrait, contrôler l'identité avec Wikidata et conserver la notice Wikipédia, le fichier Commons, l'auteur et la licence.
 
 ## Validation locale
 
@@ -77,6 +91,7 @@ npm run test
 npm run build
 npm run dev
 npm run fetch:party-logos -- --download
+npm run fetch:person-portraits -- --download
 ```
 
 Le serveur de développement est généralement disponible sur `http://localhost:5173`. Pour tester le build compilé :
@@ -94,4 +109,5 @@ Le projet utilise Vite et Netlify. `netlify.toml` configure la compilation, la p
 - Certains résultats électoraux détaillés restent volontairement non chiffrés tant qu'une source officielle homogène n'est pas intégrée.
 - Plusieurs mouvements historiques disposent de sources de cadrage provisoires ; ils sont marqués `partially_verified` ou `unverified`.
 - 55 formations n'ont pas de logo libre suffisamment fiable dans la sélection actuelle et utilisent donc un monogramme.
+- 12 personnalités n'ont pas de portrait libre suffisamment fiable dans la sélection actuelle et utilisent donc un monogramme.
 - Le bundle de production peut dépasser le seuil d'avertissement Vite de 500 kB ; cela ne bloque pas la compilation mais pourra justifier un découpage ultérieur.

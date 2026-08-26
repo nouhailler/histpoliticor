@@ -10,6 +10,7 @@ Le projet privilégie un dataset historique local, relationnel et traçable : le
 - filtres par orientation politique et type d'événement ;
 - fiches événement reliant élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres ;
 - fiches de partis, personnalités et élections avec navigation relationnelle ;
+- 139 portraits libres de personnalités servis localement, avec crédits Wikipédia/Wikimedia Commons ;
 - corpus de crises typées avec leurs conséquences et leurs sources ;
 - 52 logos libres servis localement, avec crédits et licences Wikimedia Commons ;
 - recherche locale, favoris et fonctionnement PWA hors ligne.
@@ -31,10 +32,12 @@ npm run test
 npm run build
 npm run preview
 npm run fetch:party-logos -- --download
+npm run fetch:person-portraits -- --download
 ```
 
 `npm run preview` sert localement le build de production.
 `fetch:party-logos` récupère la sélection contrôlée de logos depuis Wikimedia Commons, vérifie leur licence, les stocke dans `public/logos/parties` et régénère leurs crédits dans `src/data/partyLogos.ts`.
+`fetch:person-portraits` rapproche les personnalités avec Wikidata en contrôlant leur date de naissance, récupère les portraits libres de Wikipédia/Wikimedia Commons, les stocke dans `public/images/persons` et régénère les crédits dans `src/data/personPortraits.ts`.
 
 ## Structure
 
@@ -45,7 +48,7 @@ src/
   styles/     Interface mobile-first
   types/      Modèle éditorial et relationnel
 scripts/      Validation du dataset
-public/       Manifest, service worker, icônes, logos locaux et page hors ligne
+public/       Manifest, service worker, icônes, logos, portraits locaux et page hors ligne
 ```
 
 ## Données
@@ -73,13 +76,18 @@ La page « Partis et mouvements » utilise les logos libres dont l'identificatio
 
 Les fichiers sont conservés dans `public/logos/parties`. Les métadonnées générées dans `src/data/partyLogos.ts` enregistrent la page Commons, l'auteur, la licence et la date de récupération. Les crédits complets sont accessibles sous la grille des partis. La licence d'un fichier ne supprime pas les éventuels droits de marque attachés au logo.
 
+## Portraits et crédits
+
+Les fiches « Personnalités » affichent l'un des 139 portraits locaux lorsque l'identité a pu être contrôlée avec le nom et la date de naissance. Chaque fiche donne accès à l'image Commons, à son auteur, à sa licence et à la notice Wikipédia correspondante. En l'absence d'association certaine ou de licence libre reconnue, un monogramme neutre est conservé.
+
 Pour ajouter une fiche :
 
 1. Ajouter l'entité dans `src/data/core.ts` ou `src/data/documents.ts`.
 2. Ajouter ses sources dans `src/data/sources.ts`.
 3. Ajouter les relations utiles dans `relations`.
 4. Ajouter un logo à la sélection contrôlée de `scripts/fetch-party-logos.ts` si un fichier Commons libre et non ambigu existe.
-5. Lancer `npm run validate:data`.
+5. Régénérer les portraits avec `npm run fetch:person-portraits -- --download` après l'ajout d'une personnalité.
+6. Lancer `npm run validate:data`.
 
 Ne pas intégrer de résultat électoral, citation ou date précise sans source vérifiable. Utiliser `TODO_DATA`, `NEEDS_SOURCE` ou `dataStatus: "unverified"` si une information reste à contrôler.
 

@@ -14,6 +14,7 @@ import {
 import { useMemo, useState } from "react";
 import { dataset } from "./data";
 import { partyLogos } from "./data/partyLogos";
+import { personPortraits } from "./data/personPortraits";
 import type { CrisisType, Election, Event, EventCategory, Party, Person, Relation } from "./types/domain";
 import { byId, formatDate, idFromSlug, relatedEventsFor, relatedRelationsFor, routeFor, sourceLabels } from "./lib/entity";
 
@@ -868,7 +869,21 @@ function PartyLogoCredits() {
 }
 
 function PersonCard({ person, navigate }: { person: Person; navigate: (page: Page) => void }) {
-  return <button className="entity-card" onClick={() => navigate({ name: "person", id: person.id })}><span>{formatDate(person.bornAt)}</span><strong>{person.firstName} {person.lastName}</strong><small>{person.summary}</small></button>;
+  const portrait = personPortraits[person.id];
+  return (
+    <button className="entity-card person-card" onClick={() => navigate({ name: "person", id: person.id })}>
+      <span className="person-portrait-thumb" aria-hidden="true">
+        {portrait
+          ? <img src={portrait.path} alt="" loading="lazy" decoding="async" />
+          : <span className="person-monogram">{person.firstName[0]}{person.lastName[0]}</span>}
+      </span>
+      <span className="person-card-copy">
+        <span className="person-dates">{formatDate(person.bornAt)}</span>
+        <strong>{person.firstName} {person.lastName}</strong>
+        <small>{person.summary}</small>
+      </span>
+    </button>
+  );
 }
 
 function ElectionCard({ election, navigate }: { election: Election; navigate: (page: Page) => void }) {
@@ -926,10 +941,27 @@ function PartyDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) {
 function PersonDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) {
   const person = byId(dataset.persons, id);
   if (!person) return <Missing />;
+  const portrait = personPortraits[person.id];
   return (
     <DetailLayout title={`${person.firstName} ${person.lastName}`} eyebrow="Personnalité" id={person.id} favorites={favorites} toggleFavorite={toggleFavorite}>
-      <p>{person.summary}</p>
-      <FactGrid facts={[["Naissance", formatDate(person.bornAt)], ["Décès", formatDate(person.diedAt)], ["Professions", person.professions.join(", ")]]} />
+      <div className="person-profile">
+        <figure className={`person-portrait${portrait ? "" : " fallback"}`}>
+          {portrait
+            ? <img src={portrait.path} alt={`Portrait de ${person.firstName} ${person.lastName}`} decoding="async" />
+            : <span className="person-monogram" aria-hidden="true">{person.firstName[0]}{person.lastName[0]}</span>}
+          {portrait ? (
+            <figcaption>
+              <a href={portrait.sourceUrl} target="_blank" rel="noreferrer">Image Wikimedia Commons</a>
+              <span>{portrait.author} · {portrait.licenseUrl ? <a href={portrait.licenseUrl} target="_blank" rel="noreferrer">{portrait.license}</a> : portrait.license}</span>
+              <a href={portrait.wikipediaUrl} target="_blank" rel="noreferrer">Notice Wikipédia</a>
+            </figcaption>
+          ) : <figcaption>Aucun portrait libre identifié avec certitude.</figcaption>}
+        </figure>
+        <div className="person-biography">
+          <p>{person.summary}</p>
+          <FactGrid facts={[["Naissance", formatDate(person.bornAt)], ["Décès", formatDate(person.diedAt)], ["Professions", person.professions.join(", ")]]} />
+        </div>
+      </div>
       <LinkedSection title="Partis et organisations" ids={person.parties} kind="party" navigate={navigate} />
       <LinkedSection title="Événements liés" ids={relatedEventsFor(person.id).map((event) => event.id)} kind="event" navigate={navigate} />
       <RelationSection id={person.id} navigate={navigate} />
