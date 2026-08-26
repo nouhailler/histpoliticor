@@ -10,10 +10,14 @@ Le projet privilégie un dataset historique local, relationnel et traçable : le
 - filtres par orientation politique et type d'événement ;
 - fiches événement reliant élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres ;
 - fiches de partis, personnalités et élections avec navigation relationnelle ;
+- 151 biographies enrichies à partir de Wikipédia et Wikidata : récit biographique, lieux de naissance et de décès, nationalité, activités, formation, appartenances politiques et mandats datés ;
 - 139 portraits libres de personnalités servis localement, avec crédits Wikipédia/Wikimedia Commons ;
 - corpus de crises typées avec leurs conséquences et leurs sources ;
 - 52 logos libres servis localement, avec crédits et licences Wikimedia Commons ;
 - recherche locale, favoris et fonctionnement PWA hors ligne.
+- identité visuelle PWA dédiée, avec favicon, icône iOS et icônes installables standard et maskable.
+- menu hamburger accessible, organisé par exploration historique, acteurs politiques et documentation.
+- page Paramètres affichant la version et sa date de build, avec vérification manuelle ou automatique des mises à jour PWA.
 
 ## Installation
 
@@ -33,17 +37,21 @@ npm run build
 npm run preview
 npm run fetch:party-logos -- --download
 npm run fetch:person-portraits -- --download
+npm run fetch:person-profiles -- --download
 ```
 
 `npm run preview` sert localement le build de production.
 `fetch:party-logos` récupère la sélection contrôlée de logos depuis Wikimedia Commons, vérifie leur licence, les stocke dans `public/logos/parties` et régénère leurs crédits dans `src/data/partyLogos.ts`.
 `fetch:person-portraits` rapproche les personnalités avec Wikidata en contrôlant leur date de naissance, récupère les portraits libres de Wikipédia/Wikimedia Commons, les stocke dans `public/images/persons` et régénère les crédits dans `src/data/personPortraits.ts`.
+`fetch:person-profiles` récupère l'introduction encyclopédique française et les informations structurées de Wikidata pour les 151 personnalités, contrôle leur identité et régénère `src/data/personProfiles.ts` avec les sources, la licence et la date de récupération.
+
+La version de l'application provient de `package.json`. Vite l'injecte dans l'interface et génère `version.json` avec la date du build. Par défaut, l'application vérifie ce fichier au démarrage, lorsqu'elle redevient visible, au retour du réseau et toutes les 30 minutes. Le réglage peut être désactivé dans « Paramètres ».
 
 ## Structure
 
 ```text
 src/
-  data/       Données historiques locales
+  data/       Données historiques locales, portraits, logos et profils enrichis
   lib/        Fonctions de navigation relationnelle
   styles/     Interface mobile-first
   types/      Modèle éditorial et relationnel
@@ -76,9 +84,11 @@ La page « Partis et mouvements » utilise les logos libres dont l'identificatio
 
 Les fichiers sont conservés dans `public/logos/parties`. Les métadonnées générées dans `src/data/partyLogos.ts` enregistrent la page Commons, l'auteur, la licence et la date de récupération. Les crédits complets sont accessibles sous la grille des partis. La licence d'un fichier ne supprime pas les éventuels droits de marque attachés au logo.
 
-## Portraits et crédits
+## Portraits, biographies et crédits
 
 Les fiches « Personnalités » affichent l'un des 139 portraits locaux lorsque l'identité a pu être contrôlée avec le nom et la date de naissance. Chaque fiche donne accès à l'image Commons, à son auteur, à sa licence et à la notice Wikipédia correspondante. En l'absence d'association certaine ou de licence libre reconnue, un monogramme neutre est conservé.
+
+Les 151 fiches comportent aussi un profil biographique enrichi : l'introduction de la notice Wikipédia française, les lieux de naissance et de décès, la nationalité, les activités, la formation, les appartenances politiques et les fonctions ou mandats datés disponibles dans Wikidata. La provenance, la licence Creative Commons et la date de récupération sont affichées sur chaque fiche. Ces informations complètent le résumé éditorial local sans remplacer les relations historiques propres à HistPoliticor.
 
 Pour ajouter une fiche :
 
@@ -87,7 +97,8 @@ Pour ajouter une fiche :
 3. Ajouter les relations utiles dans `relations`.
 4. Ajouter un logo à la sélection contrôlée de `scripts/fetch-party-logos.ts` si un fichier Commons libre et non ambigu existe.
 5. Régénérer les portraits avec `npm run fetch:person-portraits -- --download` après l'ajout d'une personnalité.
-6. Lancer `npm run validate:data`.
+6. Régénérer les profils avec `npm run fetch:person-profiles -- --download` après l'ajout d'une personnalité.
+7. Lancer `npm run validate:data`.
 
 Ne pas intégrer de résultat électoral, citation ou date précise sans source vérifiable. Utiliser `TODO_DATA`, `NEEDS_SOURCE` ou `dataStatus: "unverified"` si une information reste à contrôler.
 

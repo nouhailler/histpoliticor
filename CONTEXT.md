@@ -31,19 +31,27 @@ Les coalitions et associations sont modélisées comme telles. Une coalition ne 
 - `src/data/documents.ts` contient les documents et textes politiques ;
 - `src/data/partyLogos.ts` est le manifeste généré des logos, auteurs et licences ;
 - `src/data/personPortraits.ts` est le manifeste généré des portraits, articles Wikipédia, auteurs et licences ;
+- `src/data/personProfiles.ts` contient les 151 profils biographiques générés depuis Wikipédia et Wikidata, avec leur attribution ;
 - `src/types/domain.ts` définit les contrats TypeScript du domaine ;
 - `scripts/validate-data.ts` vérifie la cohérence du corpus ;
 - `scripts/fetch-party-logos.ts` recherche, contrôle et télécharge la sélection de logos Wikimedia Commons ;
 - `scripts/fetch-person-portraits.ts` rapproche les personnes avec Wikidata et télécharge les portraits libres de Wikimedia Commons ;
+- `scripts/fetch-person-profiles.ts` rapproche les personnes avec Wikipédia/Wikidata et génère les biographies et faits structurés ;
 - `public/logos/parties` contient les 52 fichiers de logos servis localement ;
 - `public/images/persons` contient les 139 portraits servis localement ;
+- `public/icons` contient le logo maître, le favicon, l'icône iOS et les variantes PWA standard et maskable ;
 - `src/data/data.test.ts` contient les tests de cohérence du corpus et des logos.
+- `src/lib/appUpdate.ts` détecte les nouvelles versions, conserve le réglage automatique et pilote l'activation du service worker ;
 
 Les relations sont des objets de données à part entière. Elles utilisent notamment `FOUNDED_FROM`, `SPLIT_FROM`, `MERGED_INTO`, `RENAMED_TO`, `SUCCESSOR_OF`, `ALLIED_WITH` et `FOUNDED_BY`.
 
 ## Chronologie et affichage
 
 La chronologie est générée à partir des événements, des élections, des dates de création des partis et des relations datées. Elle propose des filtres idéologiques et des filtres par type.
+
+La navigation principale utilise un menu hamburger disponible sur mobile et ordinateur. Ses entrées sont regroupées en trois catégories : exploration historique, acteurs politiques et documentation. Le panneau gère le focus clavier, la touche Échap, l'état actif et la fermeture par clic hors du menu.
+
+La rubrique « Paramètres » affiche la version issue de `package.json` et la date du build. `vite.config.ts` injecte ces informations dans le bundle et génère `version.json`. La vérification automatique se fait au démarrage, au retour en ligne, lorsque l'application redevient visible et toutes les 30 minutes. Une nouvelle version déclenche la mise à jour du service worker puis le rechargement de l'application ; le réglage est conservé dans `localStorage` et peut être désactivé.
 
 Le volet d'une entrée et la fiche événement complète exposent dix ensembles historiques : élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres. Les associations sont calculées par chevauchement de dates, période et régime. Les champs techniques `importance`, `category` et `dataStatus` restent disponibles dans le modèle, mais ne sont pas affichés comme métadonnées publiques.
 
@@ -59,7 +67,7 @@ npm run fetch:party-logos -- --download
 
 Le script vérifie une licence libre reconnue, télécharge une miniature locale et régénère `src/data/partyLogos.ts`. Les éventuels droits de marque restent distincts de la licence du fichier.
 
-## Portraits
+## Portraits et profils biographiques
 
 Les cartes et les fiches « Personnalités » utilisent l'un des 139 portraits locaux lorsqu'une correspondance Wikidata fiable a été établie avec le nom et, lorsqu'elle est disponible, la date de naissance. La fiche affiche l'auteur, la licence, la page du fichier Commons et la notice Wikipédia. Les cas ambigus ou sans image libre utilisent un monogramme.
 
@@ -67,6 +75,14 @@ L'import est reproductible avec :
 
 ```bash
 npm run fetch:person-portraits -- --download
+```
+
+Les 151 fiches disposent également d'une introduction biographique issue de Wikipédia en français et de données structurées issues de Wikidata : lieux de naissance et de décès, nationalité, activités, formation, appartenances politiques et fonctions ou mandats datés. Le résumé éditorial local est conservé en tête de la biographie. Les sources, la licence Creative Commons et la date de récupération sont visibles sur la fiche.
+
+L'import des profils est reproductible avec :
+
+```bash
+npm run fetch:person-profiles -- --download
 ```
 
 ## Règles éditoriales
@@ -79,6 +95,7 @@ npm run fetch:person-portraits -- --download
 6. Préserver les fiches existantes et leurs sources lors d'une extension. Les relations nouvelles doivent décrire une transformation historique réelle.
 7. Ne jamais associer un logo sur la seule base d'un sigle ou d'un nom ambigu ; conserver sa page Commons, son auteur et sa licence.
 8. Pour un portrait, contrôler l'identité avec Wikidata et conserver la notice Wikipédia, le fichier Commons, l'auteur et la licence.
+9. Pour une biographie importée, afficher l'attribution Wikipédia/Wikidata, la licence et la date de récupération ; conserver séparément le résumé éditorial local.
 
 ## Validation locale
 
@@ -92,6 +109,7 @@ npm run build
 npm run dev
 npm run fetch:party-logos -- --download
 npm run fetch:person-portraits -- --download
+npm run fetch:person-profiles -- --download
 ```
 
 Le serveur de développement est généralement disponible sur `http://localhost:5173`. Pour tester le build compilé :

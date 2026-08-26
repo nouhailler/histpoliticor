@@ -4,6 +4,7 @@ import path from "node:path";
 import { dataset } from ".";
 import { partyLogos } from "./partyLogos";
 import { personPortraits } from "./personPortraits";
+import { personProfiles } from "./personProfiles";
 import { relatedEventsFor, relatedRelationsFor } from "../lib/entity";
 
 describe("dataset navigation requirements", () => {
@@ -78,5 +79,20 @@ describe("dataset navigation requirements", () => {
       expect(portrait.author.trim()).not.toBe("");
       expect(portrait.license.trim()).not.toBe("");
     }
+  });
+
+  it("provides an attributed enriched biography for every personality", () => {
+    const personIds = new Set(dataset.persons.map((person) => person.id));
+    const entries = Object.entries(personProfiles);
+
+    expect(entries).toHaveLength(dataset.persons.length);
+    for (const [personId, profile] of entries) {
+      expect(personIds.has(personId)).toBe(true);
+      expect(profile.extract.length).toBeGreaterThan(100);
+      expect(profile.wikipediaUrl).toContain("fr.wikipedia.org/wiki/");
+      expect(profile.wikidataId).toMatch(/^Q\d+$/);
+      expect(profile.license).toContain("Creative Commons");
+    }
+    expect(personProfiles["person-leon-blum"].positions.length).toBeGreaterThanOrEqual(5);
   });
 });

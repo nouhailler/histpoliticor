@@ -7,15 +7,21 @@ import {
   GitBranch,
   Home,
   Landmark,
+  Menu,
+  RefreshCw,
   Search,
+  Settings,
   Star,
-  Users
+  Users,
+  X
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { dataset } from "./data";
 import { partyLogos } from "./data/partyLogos";
 import { personPortraits } from "./data/personPortraits";
+import { personProfiles, type PersonProfile, type PersonProfilePosition } from "./data/personProfiles";
 import type { CrisisType, Election, Event, EventCategory, Party, Person, Relation } from "./types/domain";
+import { type AppUpdateController, useAppUpdate } from "./lib/appUpdate";
 import { byId, formatDate, idFromSlug, relatedEventsFor, relatedRelationsFor, routeFor, sourceLabels } from "./lib/entity";
 
 type Page =
@@ -28,29 +34,92 @@ type Page =
   | { name: "search"; query?: string }
   | { name: "sources" }
   | { name: "docs" }
+  | { name: "settings" }
   | { name: "party"; id: string }
   | { name: "person"; id: string }
   | { name: "event"; id: string }
   | { name: "election"; id: string };
 
-const navItems = [
-  { label: "Accueil", icon: Home, page: { name: "home" } as Page },
-  { label: "Chronologie", icon: CalendarDays, page: { name: "timeline" } as Page },
-  { label: "Partis", icon: Landmark, page: { name: "parties" } as Page },
-  { label: "Personnalités", icon: Users, page: { name: "persons" } as Page },
-  { label: "Élections", icon: Archive, page: { name: "elections" } as Page },
-  { label: "Explorer", icon: GitBranch, page: { name: "genealogy" } as Page },
-  { label: "Sources", icon: BookOpen, page: { name: "sources" } as Page }
+const menuGroups = [
+  {
+    label: "Explorer l'histoire",
+    items: [
+      { label: "Accueil", description: "Vue d'ensemble du corpus", icon: Home, page: { name: "home" } as Page },
+      { label: "Chronologie", description: "Événements et transformations", icon: CalendarDays, page: { name: "timeline" } as Page },
+      { label: "Élections", description: "Scrutins nationaux", icon: Archive, page: { name: "elections" } as Page }
+    ]
+  },
+  {
+    label: "Acteurs politiques",
+    items: [
+      { label: "Partis et mouvements", description: "Organisations et coalitions", icon: Landmark, page: { name: "parties" } as Page },
+      { label: "Personnalités", description: "Biographies et mandats", icon: Users, page: { name: "persons" } as Page },
+      { label: "Généalogie des partis", description: "Scissions, fusions et filiations", icon: GitBranch, page: { name: "genealogy" } as Page }
+    ]
+  },
+  {
+    label: "Documentation",
+    items: [
+      { label: "Sources", description: "Références du corpus", icon: BookOpen, page: { name: "sources" } as Page },
+      { label: "Méthode et données", description: "Principes éditoriaux", icon: BookOpen, page: { name: "docs" } as Page },
+      { label: "Paramètres", description: "Version et mises à jour", icon: Settings, page: { name: "settings" } as Page }
+    ]
+  }
 ];
 
 export function App() {
   const [page, setPage] = useState<Page>(() => pageFromPath(window.location.pathname));
   const [favorites, setFavorites] = useLocalFavorites();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const appUpdate = useAppUpdate();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const menuDrawerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        requestAnimationFrame(() => menuButtonRef.current?.focus());
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(menuDrawerRef.current?.querySelectorAll<HTMLElement>("button, a[href]") ?? [])
+        .filter((element) => !element.hasAttribute("disabled"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
 
   function navigate(next: Page) {
+    setMenuOpen(false);
     setPage(next);
     window.history.pushState(null, "", pathForPage(next));
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeMenu() {
+    setMenuOpen(false);
+    requestAnimationFrame(() => menuButtonRef.current?.focus());
   }
 
   const favoriteSet = new Set(favorites);
@@ -63,35 +132,84 @@ export function App() {
     <div className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={() => navigate({ name: "home" })} aria-label="Aller à l'accueil">
-          <span className="brand-mark">HP</span>
+          <span className="brand-mark" aria-hidden="true">
+            <img src="/icons/histpoliticor-icon-192.png" alt="" />
+          </span>
           <span>
             <strong>HistPoliticor</strong>
             <small>Base historique locale</small>
           </span>
         </button>
-        <button className="icon-button" onClick={() => navigate({ name: "search" })} aria-label="Rechercher">
-          <Search size={20} />
-        </button>
+        <div className="header-actions">
+          <button className="icon-button" onClick={() => navigate({ name: "search" })} aria-label="Rechercher">
+            <Search size={20} />
+          </button>
+          <button
+            ref={menuButtonRef}
+            className="icon-button menu-trigger"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Ouvrir le menu"
+            aria-expanded={menuOpen}
+            aria-controls="main-menu"
+          >
+            <Menu size={21} />
+            <span>Menu</span>
+          </button>
+        </div>
       </header>
       <main>
-        {renderPage(page, navigate, favoriteSet, toggleFavorite)}
+        {renderPage(page, navigate, favoriteSet, toggleFavorite, appUpdate)}
       </main>
-      <nav className="bottom-nav" aria-label="Navigation principale">
-        {navItems.slice(0, 6).map((item) => {
-          const Icon = item.icon;
-          return (
-            <button key={item.label} onClick={() => navigate(item.page)} className={page.name === item.page.name ? "active" : ""}>
-              <Icon size={19} />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      {menuOpen ? (
+        <div className="menu-overlay" onMouseDown={(event) => event.target === event.currentTarget && closeMenu()}>
+          <aside ref={menuDrawerRef} id="main-menu" className="menu-drawer" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+            <header className="menu-header">
+              <div>
+                <span className="menu-eyebrow">Navigation</span>
+                <h2 id="menu-title">Explorer HistPoliticor</h2>
+              </div>
+              <button ref={closeButtonRef} className="icon-button" onClick={closeMenu} aria-label="Fermer le menu">
+                <X size={21} />
+              </button>
+            </header>
+            <nav className="menu-navigation" aria-label="Menu principal">
+              {menuGroups.map((group) => (
+                <section className="menu-group" key={group.label}>
+                  <h3>{group.label}</h3>
+                  <div className="menu-links">
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = isMenuPageActive(page, item.page);
+                      return (
+                        <button key={item.label} className={active ? "active" : ""} onClick={() => navigate(item.page)} aria-current={active ? "page" : undefined}>
+                          <span className="menu-link-icon" aria-hidden="true"><Icon size={20} /></span>
+                          <span>
+                            <strong>{item.label}</strong>
+                            <small>{item.description}</small>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+            </nav>
+          </aside>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function renderPage(page: Page, navigate: (page: Page) => void, favorites: Set<string>, toggleFavorite: (id: string) => void) {
+function isMenuPageActive(current: Page, target: Page) {
+  if (target.name === "parties") return current.name === "parties" || current.name === "party";
+  if (target.name === "persons") return current.name === "persons" || current.name === "person";
+  if (target.name === "elections") return current.name === "elections" || current.name === "election";
+  if (target.name === "timeline") return current.name === "timeline" || current.name === "event";
+  return current.name === target.name;
+}
+
+function renderPage(page: Page, navigate: (page: Page) => void, favorites: Set<string>, toggleFavorite: (id: string) => void, appUpdate: AppUpdateController) {
   switch (page.name) {
     case "timeline":
       return <TimelinePage navigate={navigate} />;
@@ -109,6 +227,8 @@ function renderPage(page: Page, navigate: (page: Page) => void, favorites: Set<s
       return <SourcesPage />;
     case "docs":
       return <DocumentationPage />;
+    case "settings":
+      return <SettingsPage update={appUpdate} />;
     case "party":
       return <PartyDetail id={page.id} navigate={navigate} favorites={favorites} toggleFavorite={toggleFavorite} />;
     case "person":
@@ -942,6 +1062,16 @@ function PersonDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) 
   const person = byId(dataset.persons, id);
   if (!person) return <Missing />;
   const portrait = personPortraits[person.id];
+  const profile = personProfiles[person.id];
+  const professions = uniqueLabels([...person.professions, ...(profile?.occupations ?? [])]);
+  const facts: [string, string][] = [
+    ["Naissance", formatDate(person.bornAt)],
+    ...(profile?.birthPlaces.length ? [["Lieu de naissance", profile.birthPlaces.join(", ")] as [string, string]] : []),
+    ["Décès", formatDate(person.diedAt)],
+    ...(profile?.deathPlaces.length ? [["Lieu de décès", profile.deathPlaces.join(", ")] as [string, string]] : []),
+    ...(profile?.citizenships.length ? [["Nationalité", profile.citizenships.join(", ")] as [string, string]] : []),
+    ["Professions et activités", professions.join(", ")]
+  ];
   return (
     <DetailLayout title={`${person.firstName} ${person.lastName}`} eyebrow="Personnalité" id={person.id} favorites={favorites} toggleFavorite={toggleFavorite}>
       <div className="person-profile">
@@ -958,16 +1088,91 @@ function PersonDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) 
           ) : <figcaption>Aucun portrait libre identifié avec certitude.</figcaption>}
         </figure>
         <div className="person-biography">
-          <p>{person.summary}</p>
-          <FactGrid facts={[["Naissance", formatDate(person.bornAt)], ["Décès", formatDate(person.diedAt)], ["Professions", person.professions.join(", ")]]} />
+          <section className="biography-copy">
+            <h2>Biographie</h2>
+            <p className="person-summary">{person.summary}</p>
+            {profile
+              ? profile.extract.split(/\n+/).filter(Boolean).map((paragraph, index) => <p key={`${person.id}-bio-${index}`}>{paragraph}</p>)
+              : <p className="empty-context">Aucun résumé biographique externe n'est disponible.</p>}
+          </section>
+          <FactGrid facts={facts} />
+          {profile ? <WikipediaAttribution profile={profile} /> : null}
         </div>
       </div>
+      <PersonCareerSection person={person} profile={profile} />
       <LinkedSection title="Partis et organisations" ids={person.parties} kind="party" navigate={navigate} />
       <LinkedSection title="Événements liés" ids={relatedEventsFor(person.id).map((event) => event.id)} kind="event" navigate={navigate} />
       <RelationSection id={person.id} navigate={navigate} />
       <SourceSection ids={person.sources} />
     </DetailLayout>
   );
+}
+
+function PersonCareerSection({ person, profile }: { person: Person; profile?: PersonProfile }) {
+  const positions = profile?.positions ?? [];
+  const hasDetails = person.functions.length || positions.length || profile?.educatedAt.length || profile?.politicalParties.length;
+  if (!hasDetails) return null;
+  return (
+    <section className="person-career">
+      <h2>Fonctions, mandats et parcours</h2>
+      <div className="profile-info-grid">
+        <ProfileList title="Fonctions principales dans le corpus" items={person.functions} />
+        <ProfileList title="Formation" items={profile?.educatedAt ?? []} />
+        <ProfileList title="Affiliations politiques répertoriées" items={profile?.politicalParties ?? []} />
+      </div>
+      {positions.length ? (
+        <section className="mandates-section">
+          <h3>Mandats et responsabilités</h3>
+          <ol className="mandates-list">
+            {positions.map((position, index) => (
+              <li key={`${position.label}-${position.start ?? "unknown"}-${index}`}>
+                <strong>{position.label}</strong>
+                <span>{positionDateLabel(position)}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+    </section>
+  );
+}
+
+function ProfileList({ title, items }: { title: string; items: string[] }) {
+  const values = uniqueLabels(items);
+  if (!values.length) return null;
+  return (
+    <section className="profile-list">
+      <h3>{title}</h3>
+      <ul>{values.map((item) => <li key={item}>{item}</li>)}</ul>
+    </section>
+  );
+}
+
+function WikipediaAttribution({ profile }: { profile: PersonProfile }) {
+  return (
+    <p className="wikipedia-attribution">
+      Résumé issu de <a href={profile.wikipediaUrl} target="_blank" rel="noreferrer">Wikipédia</a>, sous{" "}
+      <a href={profile.licenseUrl} target="_blank" rel="noreferrer">{profile.license}</a>. Données structurées :{" "}
+      <a href={`https://www.wikidata.org/wiki/${profile.wikidataId}`} target="_blank" rel="noreferrer">Wikidata</a>. Mise à jour du {formatDate(profile.retrievedAt)}.
+    </p>
+  );
+}
+
+function positionDateLabel(position: PersonProfilePosition) {
+  if (position.start && position.end) return `${formatDate(position.start)} – ${formatDate(position.end)}`;
+  if (position.start) return `Depuis le ${formatDate(position.start)}`;
+  if (position.end) return `Jusqu'au ${formatDate(position.end)}`;
+  return "Dates non renseignées";
+}
+
+function uniqueLabels(values: string[]) {
+  const seen = new Set<string>();
+  return values.filter((value) => {
+    const key = normalize(value);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function EventDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) {
@@ -1070,6 +1275,86 @@ function DocumentationPage() {
       <p>Les résultats électoraux détaillés et les citations ne sont pas intégrés tant qu'une source contrôlée n'a pas été ajoutée au dataset.</p>
       <h2>Glossaire initial</h2>
       <p><strong>Scission</strong> : séparation d'une organisation en plusieurs ensembles. <strong>Coalition</strong> : alliance politique qui n'est pas nécessairement un parti.</p>
+    </section>
+  );
+}
+
+function SettingsPage({ update }: { update: AppUpdateController }) {
+  const busy = update.status === "checking" || update.status === "installing";
+  const statusLabels = {
+    idle: "Prête à vérifier",
+    checking: "Vérification en cours…",
+    "up-to-date": "L'application est à jour",
+    available: update.latest ? `Version ${update.latest.version} disponible` : "Nouvelle version disponible",
+    installing: "Installation et redémarrage…",
+    error: "Vérification impossible pour le moment"
+  } satisfies Record<typeof update.status, string>;
+
+  return (
+    <section className="page settings-page">
+      <PageTitle title="Paramètres" subtitle="Version installée et gestion des mises à jour de l'application." />
+      <div className="settings-grid">
+        <article className="settings-card version-card">
+          <div className="settings-app-identity">
+            <img src="/icons/histpoliticor-icon-192.png" alt="" />
+            <div>
+              <span className="eyebrow">Application installée</span>
+              <h2>HistPoliticor</h2>
+            </div>
+          </div>
+          <dl className="settings-version-list">
+            <div><dt>Version actuelle</dt><dd>{update.current.version}</dd></div>
+            <div><dt>Date de mise à jour</dt><dd>{formatDate(update.current.updatedAt)}</dd></div>
+            {update.latest && update.latest.version !== update.current.version
+              ? <div><dt>Version détectée</dt><dd>{update.latest.version}</dd></div>
+              : null}
+          </dl>
+        </article>
+
+        <article className="settings-card update-card">
+          <div className="settings-card-heading">
+            <div>
+              <span className="eyebrow">Maintenance</span>
+              <h2>Mises à jour</h2>
+            </div>
+            <span className={`update-status ${update.status}`} aria-live="polite">{statusLabels[update.status]}</span>
+          </div>
+
+          <label className="settings-toggle">
+            <span>
+              <strong>Mises à jour automatiques</strong>
+              <small>Vérifie la version au démarrage, au retour dans l'application et toutes les 30 minutes.</small>
+            </span>
+            <input
+              type="checkbox"
+              checked={update.automaticUpdates}
+              onChange={(event) => update.setAutomaticUpdates(event.target.checked)}
+            />
+          </label>
+
+          <p className="settings-update-note">
+            Lorsqu'une nouvelle version est disponible, elle est téléchargée puis l'application redémarre automatiquement. Les favoris locaux sont conservés.
+          </p>
+
+          <div className="settings-actions">
+            <button className="wide-action" disabled={busy} onClick={() => void update.checkForUpdate(false)}>
+              <RefreshCw size={18} className={update.status === "checking" ? "spinning" : ""} />
+              {update.status === "checking" ? "Vérification…" : "Vérifier maintenant"}
+            </button>
+            {update.status === "available" ? (
+              <button className="wide-action secondary-action" onClick={() => void update.installUpdate()}>
+                Installer la version {update.latest?.version}
+              </button>
+            ) : null}
+          </div>
+
+          {update.lastCheckedAt ? (
+            <small className="last-update-check">
+              Dernière vérification : {update.lastCheckedAt.toLocaleDateString("fr-FR")} à {update.lastCheckedAt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}.
+            </small>
+          ) : null}
+        </article>
+      </div>
     </section>
   );
 }
@@ -1198,6 +1483,7 @@ function pathForPage(page: Page) {
   if (page.name === "event") return routeFor("event", page.id);
   if (page.name === "election") return routeFor("election", page.id);
   if (page.name === "genealogy" && page.partyId) return `/genealogie/${page.partyId.replace("party-", "")}`;
+  if (page.name === "settings") return "/parametres";
   return `/${page.name === "home" ? "" : page.name}`;
 }
 
@@ -1215,5 +1501,6 @@ function pageFromPath(path: string): Page {
   if (section === "search") return { name: "search" };
   if (section === "sources") return { name: "sources" };
   if (section === "docs") return { name: "docs" };
+  if (section === "settings" || section === "parametres") return { name: "settings" };
   return { name: "home" };
 }
