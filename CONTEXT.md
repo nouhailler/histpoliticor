@@ -10,12 +10,12 @@ Le projet est hébergé sur GitHub :
 
 ## État du corpus
 
-Le dataset est local. Au 26 août 2026, il contient 107 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 157 sources. Les périodes déjà structurées comprennent notamment :
+Le dataset est local. Au 26 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 159 sources. Les périodes déjà structurées comprennent notamment :
 
 - 1880-1899 : consolidation républicaine, mouvement ouvrier, boulangisme et affaire Dreyfus ;
 - IIIe République : radicalisme, républicains modérés, socialismes, SFIO, ligues et Front populaire ;
 - IVe République : PCF, SFIO, MRP, RPF, CNIP, UDSR et recompositions liées à la décolonisation ;
-- Ve République : gaullisme, UNR/UDR/RPR, UDF, PS, PCF, écologie, souverainisme et extrême droite ;
+- Ve République : gaullisme, UNR/UNR-UDT/UDR/RPR, UDF, PS, PCF, écologie, souverainisme et extrême droite ;
 - années 1990-2000 : Gauche plurielle, MDC/MRC, UMP, MoDem, MPF, RPF souverainiste, MNR et altermondialisme ;
 - années 2010-2020 : Hollande, Macron, LREM, LFI, EELV, LR, RN, DLF, UPR, NPA, NUPES, Reconquête et Parti animaliste ;
 - crises politiques, partisanes, économiques, sociales, militaires, sanitaires, environnementales et territoriales jusqu'en 2026.
@@ -40,8 +40,10 @@ Les coalitions et associations sont modélisées comme telles. Une coalition ne 
 - `public/logos/parties` contient les 52 fichiers de logos servis localement ;
 - `public/images/persons` contient les 139 portraits servis localement ;
 - `public/icons` contient le logo maître, le favicon, l'icône iOS et les variantes PWA standard et maskable ;
-- `src/data/data.test.ts` contient les tests de cohérence du corpus et des logos.
+- `src/data/data.test.ts` contient les tests de cohérence du corpus et des logos ;
 - `src/lib/appUpdate.ts` détecte les nouvelles versions, conserve le réglage automatique et pilote l'activation du service worker ;
+- `src/lib/genealogy.ts` normalise les relations de filiation et calcule la disposition du graphe généalogique ;
+- `src/lib/genealogy.test.ts` vérifie le sens des relations, la chaîne gaulliste et la progression gauche-droite du graphe ;
 
 Les relations sont des objets de données à part entière. Elles utilisent notamment `FOUNDED_FROM`, `SPLIT_FROM`, `MERGED_INTO`, `RENAMED_TO`, `SUCCESSOR_OF`, `ALLIED_WITH` et `FOUNDED_BY`.
 
@@ -54,6 +56,10 @@ La navigation principale utilise un menu hamburger disponible sur mobile et ordi
 La rubrique « Paramètres » affiche la version issue de `package.json` et la date du build. `vite.config.ts` injecte ces informations dans le bundle et génère `version.json`. La vérification automatique se fait au démarrage, au retour en ligne, lorsque l'application redevient visible et toutes les 30 minutes. Une nouvelle version déclenche la mise à jour du service worker puis le rechargement de l'application ; le réglage est conservé dans `localStorage` et peut être désactivé.
 
 Le volet d'une entrée et la fiche événement complète exposent dix ensembles historiques : élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres. Les associations sont calculées par chevauchement de dates, période et régime. Les champs techniques `importance`, `category` et `dataStatus` restent disponibles dans le modèle, mais ne sont pas affichés comme métadonnées publiques.
+
+La page « Généalogie des partis » produit un graphe orienté à partir des relations entre formations. L'utilisateur choisit une famille politique, active ou masque les créations, scissions, fusions, changements de nom et successions, sélectionne un parti ou une transformation et ajuste le zoom. Le moteur inverse les relations dont le modèle est exprimé depuis le successeur (`FOUNDED_FROM`, `SPLIT_FROM`, `SUCCESSOR_OF`) afin que la lecture visuelle reste toujours origine → nouvelle formation. Les partis disparus et actifs ont des états distincts ; les fiches complètes restent accessibles depuis le panneau contextuel.
+
+Le parcours gaulliste de référence est RPF → Républicains sociaux → UNR, puis fusion de l'UNR et de l'UDT dans l'UNR-UDT, changement de nom en UDR, et continuité UDR → RPR → UMP → LR. La bifurcation RPR → RPF souverainiste et l'apport de Démocratie libérale à l'UMP sont également représentés.
 
 ## Logos
 

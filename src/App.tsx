@@ -13,7 +13,9 @@ import {
   Settings,
   Star,
   Users,
-  X
+  X,
+  ZoomIn,
+  ZoomOut
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { dataset } from "./data";
@@ -23,6 +25,13 @@ import { personProfiles, type PersonProfile, type PersonProfilePosition } from "
 import type { CrisisType, Election, Event, EventCategory, Party, Person, Relation } from "./types/domain";
 import { type AppUpdateController, useAppUpdate } from "./lib/appUpdate";
 import { byId, formatDate, idFromSlug, relatedEventsFor, relatedRelationsFor, routeFor, sourceLabels } from "./lib/entity";
+import {
+  buildGenealogyGraph,
+  genealogyCategories,
+  layoutGenealogyGraph,
+  type GenealogyCategory,
+  type GenealogyEdge
+} from "./lib/genealogy";
 
 type Page =
   | { name: "home" }
@@ -1215,35 +1224,264 @@ function ElectionDetail({ id, navigate, favorites, toggleFavorite }: DetailProps
   );
 }
 
-function GenealogyPage({ navigate, partyId = "party-sfio" }: { navigate: (page: Page) => void; partyId?: string }) {
-  const party = byId(dataset.parties, partyId) ?? dataset.parties[0];
-  const relations = relatedRelationsFor(party.id).filter((relation) => relation.sourceKind === "party" || relation.targetKind === "party");
+function GenealogyPage({ navigate, partyId = "party-rpf" }: { navigate: (page: Page) => void; partyId?: string }) {
+  const initialParty = byId(dataset.parties, partyId) ?? byId(dataset.parties, "party-rpf") ?? dataset.parties[0];
+  const initialFamily = initialParty.families.includes("family-gaullisme") ? "family-gaullisme" : initialParty.families[0];
+  const allCategoryIds = genealogyCategories.map((category) => category.id);
+  const [familyId, setFamilyId] = useState(initialFamily);
+  const [activeCategories, setActiveCategories] = useState<Set<GenealogyCategory>>(() => new Set(allCategoryIds));
+  const [selectedPartyId, setSelectedPartyId] = useState(initialParty.id);
+  const [selectedRelationId, setSelectedRelationId] = useState<string>();
+  const [zoom, setZoom] = useState(1);
+  const graphViewportRef = useRef<HTMLDivElement>(null);
+
+  const availableFamilies = useMemo(() => dataset.families
+    .filter((family) => buildGenealogyGraph(dataset.parties, dataset.relations, family.id, new Set(allCategoryIds)).edges.length)
+    .sort((left, right) => left.name.localeCompare(right.name, "fr")), []);
+  const graph = useMemo(
+    () => buildGenealogyGraph(dataset.parties, dataset.relations, familyId, activeCategories),
+    [activeCategories, familyId]
+  );
+  const layout = useMemo(() => layoutGenealogyGraph(graph.nodes, graph.edges), [graph]);
+  const selectedParty = graph.nodes.find((party) => party.id === selectedPartyId);
+  const selectedEdge = graph.edges.find((edge) => edge.relation.id === selectedRelationId);
+
+  useEffect(() => {
+    if (selectedParty || selectedEdge) return;
+    setSelectedPartyId(graph.nodes[0]?.id ?? "");
+    setSelectedRelationId(undefined);
+  }, [graph.nodes, selectedEdge, selectedParty]);
+
+  useEffect(() => {
+    const viewport = graphViewportRef.current;
+    const position = layout.positions[selectedPartyId];
+    if (!viewport || !position) return;
+    const left = Math.max(0, (position.x + layout.nodeWidth / 2) * zoom - viewport.clientWidth / 2);
+    const top = Math.max(0, (position.y + layout.nodeHeight / 2) * zoom - viewport.clientHeight / 2);
+    viewport.scrollTo({ left, top, behavior: "smooth" });
+  }, [layout, selectedPartyId, zoom]);
+
+  function selectFamily(nextFamilyId: string) {
+    setFamilyId(nextFamilyId);
+    setSelectedPartyId("");
+    setSelectedRelationId(undefined);
+    setZoom(1);
+  }
+
+  function toggleCategory(category: GenealogyCategory) {
+    setActiveCategories((current) => {
+      if (current.has(category) && current.size === 1) return current;
+      const next = new Set(current);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      return next;
+    });
+    setSelectedRelationId(undefined);
+  }
+
+  function selectParty(id: string) {
+    setSelectedPartyId(id);
+    setSelectedRelationId(undefined);
+  }
+
   return (
-    <section className="page">
-      <PageTitle title="Généalogie des partis" subtitle="Relations de scission, alliance ou succession représentées comme données." />
-      <div className="filter-row">
-        <select value={party.id} onChange={(event) => navigate({ name: "genealogy", partyId: event.target.value })} aria-label="Choisir un parti">
-          {dataset.parties.map((item) => <option key={item.id} value={item.id}>{item.acronym} - {item.name}</option>)}
-        </select>
-      </div>
-      <div className="genealogy">
-        <button className="node selected" onClick={() => navigate({ name: "party", id: party.id })}>{party.acronym}</button>
-        <div className="edges">
-          {relations.map((relation) => {
-            const otherId = relation.source === party.id ? relation.target : relation.source;
-            const other = byId(dataset.parties, otherId);
-            return (
-              <button key={relation.id} className="edge-card" onClick={() => other && navigate({ name: "party", id: other.id })}>
-                <span>{relation.relation}</span>
-                <strong>{other?.acronym ?? otherId}</strong>
-                <small>{relation.description}</small>
-              </button>
-            );
-          })}
+    <section className="page genealogy-page">
+      <PageTitle
+        title="Généalogie des partis"
+        subtitle="Créations, scissions, fusions, changements de nom, successions et disparitions dans une même visualisation interactive."
+      />
+
+      <div className="genealogy-controls">
+        <label>
+          <span>Famille politique</span>
+          <select value={familyId} onChange={(event) => selectFamily(event.target.value)}>
+            {availableFamilies.map((family) => <option key={family.id} value={family.id}>{family.name}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>Mettre un parti en évidence</span>
+          <select value={selectedParty?.id ?? ""} onChange={(event) => selectParty(event.target.value)} disabled={!graph.nodes.length}>
+            {!selectedParty ? <option value="">Relation sélectionnée</option> : null}
+            {graph.nodes.map((party) => <option key={party.id} value={party.id}>{party.acronym} - {party.name}</option>)}
+          </select>
+        </label>
+        <div className="genealogy-zoom" aria-label="Zoom du graphe">
+          <button onClick={() => setZoom((value) => Math.max(0.7, Number((value - 0.1).toFixed(1))))} aria-label="Réduire le graphe"><ZoomOut size={19} /></button>
+          <span>{Math.round(zoom * 100)} %</span>
+          <button onClick={() => setZoom((value) => Math.min(1.4, Number((value + 0.1).toFixed(1))))} aria-label="Agrandir le graphe"><ZoomIn size={19} /></button>
         </div>
+      </div>
+
+      <div className="genealogy-relation-filters" aria-label="Types de relations">
+        {genealogyCategories.map((category) => (
+          <button
+            key={category.id}
+            className={`relation-${category.id}`}
+            aria-pressed={activeCategories.has(category.id)}
+            onClick={() => toggleCategory(category.id)}
+          >
+            <span aria-hidden="true" />
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="genealogy-summary" aria-live="polite">
+        <strong>{graph.nodes.length} formations</strong>
+        <span>{graph.edges.length} transformations représentées</span>
+        {graph.hiddenParties ? <span>{graph.hiddenParties} formations sans filiation documentée non affichées</span> : null}
+      </div>
+
+      {graph.nodes.length ? (
+        <div className="genealogy-workspace">
+          <div className="genealogy-viewport" ref={graphViewportRef} aria-label="Arbre généalogique des partis">
+            <div className="genealogy-scaled-canvas" style={{ width: layout.width * zoom, height: layout.height * zoom }}>
+              <div className="genealogy-stage" style={{ width: layout.width, height: layout.height, transform: `scale(${zoom})` }}>
+                <svg className="genealogy-lines" width={layout.width} height={layout.height} aria-hidden="true">
+                  <defs>
+                    {genealogyCategories.map((category) => (
+                      <marker key={category.id} id={`genealogy-arrow-${category.id}`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+                        <path d="M0,0 L8,4 L0,8 Z" className={`relation-${category.id}`} />
+                      </marker>
+                    ))}
+                  </defs>
+                  {graph.edges.map((edge) => {
+                    const from = layout.positions[edge.from];
+                    const to = layout.positions[edge.to];
+                    if (!from || !to) return null;
+                    const startX = from.x + layout.nodeWidth;
+                    const startY = from.y + layout.nodeHeight / 2;
+                    const endX = to.x;
+                    const endY = to.y + layout.nodeHeight / 2;
+                    const curve = Math.max(42, (endX - startX) * 0.46);
+                    return (
+                      <path
+                        key={edge.relation.id}
+                        className={`genealogy-line relation-${edge.category}${selectedRelationId === edge.relation.id ? " selected" : ""}`}
+                        d={`M ${startX} ${startY} C ${startX + curve} ${startY}, ${endX - curve} ${endY}, ${endX} ${endY}`}
+                        markerEnd={`url(#genealogy-arrow-${edge.category})`}
+                      />
+                    );
+                  })}
+                </svg>
+
+                {graph.edges.map((edge) => {
+                  const from = layout.positions[edge.from];
+                  const to = layout.positions[edge.to];
+                  if (!from || !to) return null;
+                  const fromParty = byId(dataset.parties, edge.from);
+                  const toParty = byId(dataset.parties, edge.to);
+                  return (
+                    <button
+                      key={`${edge.relation.id}-label`}
+                      className={`genealogy-edge-label relation-${edge.category}${selectedRelationId === edge.relation.id ? " selected" : ""}`}
+                      style={{ left: (from.x + layout.nodeWidth + to.x) / 2 - 43, top: (from.y + to.y) / 2 + layout.nodeHeight / 2 - 13 }}
+                      onClick={() => {
+                        setSelectedRelationId(edge.relation.id);
+                        setSelectedPartyId("");
+                      }}
+                      aria-label={`${genealogyCategoryLabel(edge.category)} de ${fromParty?.acronym ?? edge.from} vers ${toParty?.acronym ?? edge.to}`}
+                    >
+                      {genealogyCategoryLabel(edge.category)} · {shortYear(edge.relation.date)}
+                    </button>
+                  );
+                })}
+
+                {graph.nodes.map((party) => {
+                  const position = layout.positions[party.id];
+                  return (
+                    <button
+                      key={party.id}
+                      className={`genealogy-party-node${selectedPartyId === party.id ? " selected" : ""}${party.dissolvedAt ? " historical" : " active"}`}
+                      style={{ left: position.x, top: position.y, width: layout.nodeWidth, height: layout.nodeHeight }}
+                      onClick={() => selectParty(party.id)}
+                      aria-pressed={selectedPartyId === party.id}
+                      aria-label={`${party.acronym}, ${party.name}, ${partyLifeLabel(party)}`}
+                    >
+                      <span className="genealogy-node-date">{shortYear(party.foundedAt)} → {party.dissolvedAt ? shortYear(party.dissolvedAt) : "aujourd'hui"}</span>
+                      <strong>{party.acronym}</strong>
+                      <small>{party.name}</small>
+                      <span className="genealogy-node-status">{party.dissolvedAt ? "Disparu" : "Actif"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <GenealogyDetail
+            edge={selectedEdge}
+            party={selectedParty}
+            graphEdges={graph.edges}
+            navigate={navigate}
+            selectParty={selectParty}
+          />
+        </div>
+      ) : (
+        <p className="notice">Aucune relation de ce type n'est documentée pour cette famille politique.</p>
+      )}
+
+      <div className="genealogy-legend" aria-label="Légende">
+        <span><i className="active-node" /> Parti actif</span>
+        <span><i className="historical-node" /> Parti disparu</span>
+        <small>Lecture de gauche à droite ; les dates et la nature de chaque transformation restent accessibles sans survol.</small>
       </div>
     </section>
   );
+}
+
+function GenealogyDetail({ edge, party, graphEdges, navigate, selectParty }: {
+  edge?: GenealogyEdge;
+  party?: Party;
+  graphEdges: GenealogyEdge[];
+  navigate: (page: Page) => void;
+  selectParty: (id: string) => void;
+}) {
+  if (edge) {
+    const from = byId(dataset.parties, edge.from);
+    const to = byId(dataset.parties, edge.to);
+    return (
+      <aside className="genealogy-detail" aria-live="polite">
+        <span className={`genealogy-detail-type relation-${edge.category}`}>{genealogyCategoryLabel(edge.category)}</span>
+        <h2>{from?.acronym ?? edge.from} <ArrowRight size={18} aria-hidden="true" /> {to?.acronym ?? edge.to}</h2>
+        <p className="genealogy-detail-date">{formatDate(edge.relation.date)}</p>
+        <p>{edge.relation.description}</p>
+        <div className="genealogy-detail-actions">
+          {from ? <button onClick={() => selectParty(from.id)}>Voir {from.acronym} dans l'arbre</button> : null}
+          {to ? <button onClick={() => selectParty(to.id)}>Voir {to.acronym} dans l'arbre</button> : null}
+        </div>
+      </aside>
+    );
+  }
+  if (!party) return <aside className="genealogy-detail empty-context">Sélectionnez une formation ou une relation.</aside>;
+  const connections = graphEdges.filter((edge) => edge.from === party.id || edge.to === party.id);
+  return (
+    <aside className="genealogy-detail" aria-live="polite">
+      <span className="eyebrow">Formation sélectionnée</span>
+      <h2>{party.acronym} — {party.name}</h2>
+      <dl>
+        <div><dt>Création</dt><dd>{formatDate(party.foundedAt)}</dd></div>
+        <div><dt>Disparition</dt><dd>{party.dissolvedAt ? formatDate(party.dissolvedAt) : "Formation active"}</dd></div>
+        <div><dt>Transformations</dt><dd>{connections.length}</dd></div>
+      </dl>
+      <p>{party.description}</p>
+      <button className="wide-action" onClick={() => navigate({ name: "party", id: party.id })}>Ouvrir la fiche complète</button>
+    </aside>
+  );
+}
+
+function genealogyCategoryLabel(category: GenealogyCategory) {
+  return genealogyCategories.find((item) => item.id === category)?.label ?? category;
+}
+
+function shortYear(value?: string | null) {
+  return value?.slice(0, 4) ?? "?";
+}
+
+function partyLifeLabel(party: Party) {
+  return party.dissolvedAt
+    ? `créé en ${shortYear(party.foundedAt)}, disparu en ${shortYear(party.dissolvedAt)}`
+    : `créé en ${shortYear(party.foundedAt)}, toujours actif`;
 }
 
 function SourcesPage() {

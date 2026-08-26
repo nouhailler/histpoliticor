@@ -421,6 +421,23 @@ export const sources: Source[] = [
     accessDate: "2026-08-24"
   },
   {
+    id: "source-bnf-unr-udt",
+    title: "Notice de collectivité : Union pour la nouvelle République (France)",
+    publisher: "Bibliothèque nationale de France",
+    url: "https://catalogue.bnf.fr/ark:/12148/cb12304525n",
+    type: "bibliotheque",
+    accessDate: "2026-08-26",
+    notes: "La notice documente les dénominations successives UNR, UNR-UDT puis UD-Ve et la fusion avec l'UDT."
+  },
+  {
+    id: "source-assemblee-unr-udt",
+    title: "Députés de la IIe législature (1962-1967) : groupe UNR-UDT",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/2/deputes2.asp",
+    type: "institution",
+    accessDate: "2026-08-26"
+  },
+  {
     id: "source-archives-nationales-1958",
     title: "1958. D'une République à l'autre",
     publisher: "Archives nationales",

@@ -7,6 +7,7 @@ Le projet privilégie un dataset historique local, relationnel et traçable : le
 ## Fonctionnalités principales
 
 - chronologie interactive générée à partir des événements, élections, partis et relations ;
+- arbre généalogique interactif des partis, filtrable par famille politique et par transformation (création, scission, fusion, changement de nom ou succession), avec zoom et fiches contextuelles ;
 - filtres par orientation politique et type d'événement ;
 - fiches événement reliant élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres ;
 - fiches de partis, personnalités et élections avec navigation relationnelle ;
@@ -52,7 +53,7 @@ La version de l'application provient de `package.json`. Vite l'injecte dans l'in
 ```text
 src/
   data/       Données historiques locales, portraits, logos et profils enrichis
-  lib/        Fonctions de navigation relationnelle
+  lib/        Navigation relationnelle, mises à jour PWA et moteur de généalogie
   styles/     Interface mobile-first
   types/      Modèle éditorial et relationnel
 scripts/      Validation du dataset
@@ -63,7 +64,7 @@ public/       Manifest, service worker, icônes, logos, portraits locaux et page
 
 Les données principales sont locales et séparées des composants React. Les relations entre entités sont des données de première classe.
 
-État actuel du corpus : 107 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 157 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
+État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 159 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
 
 Le corpus couvre notamment les recompositions suivantes :
 
@@ -75,6 +76,8 @@ Le corpus couvre notamment les recompositions suivantes :
 - UMP/LR, LREM, LFI, EELV, RN et nouveaux mouvements depuis 2010.
 
 Les associations, ligues et coalitions sont conservées lorsqu'elles jouent un rôle historique important, avec un `status` explicite afin de ne pas les confondre avec des partis.
+
+La rubrique « Généalogie des partis » transforme les relations historiques en graphe orienté de gauche à droite. Le courant gaulliste y suit notamment RPF → Républicains sociaux → UNR, la fusion UNR + UDT → UNR-UDT, puis UDR → RPR → UMP → LR. Les branches, comme la scission du RPF souverainiste en 1999, et les apports extérieurs, comme Démocratie libérale lors de la création de l'UMP, restent visibles.
 
 Les champs éditoriaux techniques tels que `importance`, `category` et `dataStatus` restent dans le modèle et servent à la structuration ou à la validation. Ils ne sont pas affichés comme tels dans les fiches publiques.
 
