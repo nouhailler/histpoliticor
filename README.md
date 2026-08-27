@@ -7,6 +7,7 @@ Le projet privilégie un dataset historique local, relationnel et traçable : le
 ## Fonctionnalités principales
 
 - chronologie interactive générée à partir des événements, élections, partis et relations ;
+- accueil dynamique renouvelé chaque jour à partir du corpus, avec anniversaires historiques, citation sourcée et jalons annuels cliquables ;
 - arbre généalogique interactif des partis, filtrable par famille politique et par transformation (création, scission, fusion, changement de nom ou succession), avec zoom et fiches contextuelles ;
 - filtres par orientation politique et type d'événement ;
 - fiches événement reliant élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres ;
@@ -64,7 +65,7 @@ public/       Manifest, service worker, icônes, logos, portraits locaux et page
 
 Les données principales sont locales et séparées des composants React. Les relations entre entités sont des données de première classe.
 
-État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 159 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
+État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 160 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
 
 Le corpus couvre notamment les recompositions suivantes :
 

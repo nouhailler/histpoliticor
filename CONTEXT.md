@@ -10,7 +10,7 @@ Le projet est hébergé sur GitHub :
 
 ## État du corpus
 
-Le dataset est local. Au 26 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 159 sources. Les périodes déjà structurées comprennent notamment :
+Le dataset est local. Au 27 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 160 sources. Les périodes déjà structurées comprennent notamment :
 
 - 1880-1899 : consolidation républicaine, mouvement ouvrier, boulangisme et affaire Dreyfus ;
 - IIIe République : radicalisme, républicains modérés, socialismes, SFIO, ligues et Front populaire ;
@@ -50,6 +50,8 @@ Les relations sont des objets de données à part entière. Elles utilisent nota
 ## Chronologie et affichage
 
 La chronologie est générée à partir des événements, des élections, des dates de création des partis et des relations datées. Elle propose des filtres idéologiques et des filtres par type.
+
+L'accueil calcule chaque jour une sélection déterministe d'événements, personnalités, partis, élections et transformations disposant de sources. « Ce jour-là » privilégie les entrées dont le mois et le jour correspondent à la date courante, puis une entrée du même mois. La citation de Jean Jaurès est reliée à sa transcription primaire sur Wikisource. Toutes les cartes, les jalons 1905, 1920, 1936 et 1958, ainsi que la clause historique sont des zones interactives. Les jalons ouvrent une route de chronologie annuelle (`/timeline/:année`) et initialisent le filtre d'année correspondant.
 
 La navigation principale utilise un menu hamburger disponible sur mobile et ordinateur. Ses entrées sont regroupées en trois catégories : exploration historique, acteurs politiques et documentation. Le panneau gère le focus clavier, la touche Échap, l'état actif et la fermeture par clic hors du menu.
 

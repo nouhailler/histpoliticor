@@ -133,13 +133,29 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .hero-actions button:nth-child(2), .hero-actions button:nth-child(3), .chips button { background: #fffaf1; color: var(--green); }
 .archive-visual {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding: 14px;
   border: 1px solid var(--line);
   background: #fffaf1;
 }
-.archive-visual span { min-height: 88px; display: grid; place-items: center; border: 1px solid var(--line); color: var(--oxide); font-family: Georgia, serif; font-size: 1.5rem; background: var(--paper); }
+.archive-visual button {
+  min-height: 104px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--oxide);
+  padding: 12px;
+  text-align: left;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.archive-visual button:hover { border-color: var(--oxide); transform: translateY(-2px); box-shadow: 0 5px 12px rgba(32, 37, 34, 0.1); }
+.archive-visual strong { font-family: Georgia, serif; font-size: 1.5rem; }
+.archive-visual small { color: var(--muted); font-size: 0.68rem; line-height: 1.25; }
 
 .discovery-grid, .card-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 .discovery-card, .entity-card, .source-card, .notice, .detail, .edge-card, .relation-row {
@@ -150,10 +166,15 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
   text-align: left;
   padding: 16px;
 }
-.discovery-card { min-height: 132px; display: flex; flex-direction: column; justify-content: space-between; }
+.discovery-card { min-height: 152px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease; }
+.discovery-card:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(32, 37, 34, 0.1); }
 .discovery-card span, .entity-card span, .source-card span, .edge-card span, .relation-row span { color: var(--oxide); font-weight: 750; font-size: 0.78rem; text-transform: uppercase; }
 .discovery-card strong, .entity-card strong, .edge-card strong { display: block; margin: 8px 0; font-size: 1.08rem; }
+.discovery-card .discovery-cta { display: inline-flex; align-items: center; gap: 4px; align-self: flex-end; margin-top: 12px; color: var(--green); font-size: 0.72rem; text-transform: none; }
 .notice { margin-top: 18px; line-height: 1.6; }
+.home-notice { display: block; width: 100%; cursor: pointer; font: inherit; }
+.home-notice:hover { border-color: var(--green); }
+.home-notice p:last-child { display: flex; align-items: center; gap: 6px; }
 
 .page, .detail { padding-top: 14px; }
 .page-title { margin-bottom: 18px; }
@@ -168,6 +189,7 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
   padding: 0 12px;
   color: var(--ink);
 }
+.filter-row { display: grid; grid-template-columns: 1fr; }
 .segmented-filter { margin-bottom: 10px; }
 .segmented-filter button {
   min-height: 42px;
@@ -603,7 +625,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (min-width: 760px) {
   main { padding: 24px; }
   .hero { grid-template-columns: 1.2fr 0.8fr; min-height: 72vh; }
+  .archive-visual { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .discovery-grid, .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filter-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .fact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .person-profile { grid-template-columns: minmax(210px, 270px) minmax(0, 1fr); }
   .profile-info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

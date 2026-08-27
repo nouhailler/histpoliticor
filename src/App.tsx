@@ -25,6 +25,7 @@ import { personProfiles, type PersonProfile, type PersonProfilePosition } from "
 import type { CrisisType, Election, Event, EventCategory, Party, Person, Relation } from "./types/domain";
 import { type AppUpdateController, useAppUpdate } from "./lib/appUpdate";
 import { byId, formatDate, idFromSlug, relatedEventsFor, relatedRelationsFor, routeFor, sourceLabels } from "./lib/entity";
+import { dailyPick, pickAnniversary, yearOf } from "./lib/home";
 import {
   buildGenealogyGraph,
   genealogyCategories,
@@ -35,7 +36,7 @@ import {
 
 type Page =
   | { name: "home" }
-  | { name: "timeline" }
+  | { name: "timeline"; year?: number }
   | { name: "parties" }
   | { name: "persons" }
   | { name: "elections" }
@@ -221,7 +222,7 @@ function isMenuPageActive(current: Page, target: Page) {
 function renderPage(page: Page, navigate: (page: Page) => void, favorites: Set<string>, toggleFavorite: (id: string) => void, appUpdate: AppUpdateController) {
   switch (page.name) {
     case "timeline":
-      return <TimelinePage navigate={navigate} />;
+      return <TimelinePage navigate={navigate} initialYear={page.year} />;
     case "parties":
       return <PartyListPage navigate={navigate} />;
     case "persons":
@@ -251,55 +252,106 @@ function renderPage(page: Page, navigate: (page: Page) => void, favorites: Set<s
   }
 }
 
+const archiveYears = [1905, 1920, 1936, 1958];
+const historicalQuotes = [
+  {
+    text: "Le courage c’est de chercher la vérité et de la dire.",
+    author: "Jean Jaurès",
+    context: "Discours à la jeunesse, Albi, juillet 1903",
+    personId: "person-jean-jaures",
+    sourceId: "source-wikisource-jaures-1903"
+  }
+];
+
 function HomePage({ navigate, favorites }: { navigate: (page: Page) => void; favorites: Set<string> }) {
-  const featuredEvent = byId(dataset.events, "event-front-populaire-1936")!;
-  const featuredPerson = byId(dataset.persons, "person-leon-blum")!;
-  const featuredParty = byId(dataset.parties, "party-sfio")!;
-  const featuredElection = byId(dataset.elections, "election-legislatives-1936")!;
+  const today = useMemo(() => new Date(), []);
+  const timelineEntries = useMemo(() => buildTimelineEntries(), []);
+  const sourcedEvents = dataset.events.filter((item) => item.sources.length && item.dataStatus !== "unverified" && item.importance >= 3);
+  const sourcedPersons = dataset.persons.filter((item) => item.sources.length && item.dataStatus !== "unverified");
+  const sourcedParties = dataset.parties.filter((item) => item.sources.length && item.dataStatus !== "unverified");
+  const sourcedElections = dataset.elections.filter((item) => item.sources.length && item.dataStatus !== "unverified");
+  const partyRelations = dataset.relations.filter((item) => item.sourceKind === "party" && item.targetKind === "party" && item.sources.length && item.dataStatus !== "unverified");
+  const featuredEvent = dailyPick(sourcedEvents, today) ?? dataset.events[0];
+  const featuredPerson = dailyPick(sourcedPersons, today, 1) ?? dataset.persons[0];
+  const featuredParty = dailyPick(sourcedParties, today, 2) ?? dataset.parties[0];
+  const featuredElection = dailyPick(sourcedElections, today, 3) ?? dataset.elections[0];
+  const anniversary = pickAnniversary(timelineEntries, today, (entry) => entry.date, 4);
+  const featuredQuote = dailyPick(historicalQuotes, today, 5) ?? historicalQuotes[0];
+  const featuredQuoteSource = byId(dataset.sources, featuredQuote.sourceId);
+  const featuredRelation = dailyPick(partyRelations, today, 6) ?? partyRelations[0];
+  const relationFrom = featuredRelation ? byId(dataset.parties, featuredRelation.source) : undefined;
+  const relationTo = featuredRelation ? byId(dataset.parties, featuredRelation.target) : undefined;
+  const firstTimelineYear = Math.min(...dataset.periods.map((period) => yearOf(period.start) ?? Number.POSITIVE_INFINITY));
+  const milestones = archiveYears.map((year) => {
+    const event = dataset.events
+      .filter((item) => yearOf(item.date) === year && item.sources.length)
+      .sort((left, right) => right.importance - left.importance || left.date.localeCompare(right.date))[0];
+    return { year, label: event?.title ?? `Explorer l'année ${year}` };
+  });
 
   return (
     <>
       <section className="hero">
         <div>
-          <p className="eyebrow">Encyclopédie documentaire, 1900 à aujourd'hui</p>
+          <p className="eyebrow">Encyclopédie documentaire, {firstTimelineYear} à aujourd'hui</p>
           <h1>L'histoire des partis politiques français</h1>
-          <p>Comprendre les partis, les hommes, les élections et les transformations politiques de la France depuis 1900.</p>
+          <p>Comprendre les partis, les personnalités, les élections et les transformations politiques de la France depuis {firstTimelineYear}.</p>
           <div className="hero-actions">
             <button onClick={() => navigate({ name: "timeline" })}>Explorer la chronologie</button>
             <button onClick={() => navigate({ name: "parties" })}>Explorer les partis</button>
             <button onClick={() => navigate({ name: "elections" })}>Explorer les élections</button>
           </div>
         </div>
-        <div className="archive-visual" aria-hidden="true">
-          <span>1905</span><span>1920</span><span>1936</span><span>1958</span>
-        </div>
+        <nav className="archive-visual" aria-label="Accéder à une année de la chronologie">
+          {milestones.map((milestone) => (
+            <button key={milestone.year} onClick={() => navigate({ name: "timeline", year: milestone.year })} aria-label={`Explorer ${milestone.year} dans la chronologie : ${milestone.label}`}>
+              <strong>{milestone.year}</strong>
+              <small>{milestone.label}</small>
+            </button>
+          ))}
+        </nav>
       </section>
       <section className="discovery-grid" aria-label="Blocs découverte">
         <Discovery title="Événement du jour" value={featuredEvent.title} detail={formatDate(featuredEvent.date)} onClick={() => navigate({ name: "event", id: featuredEvent.id })} />
         <Discovery title="Personnalité du jour" value={`${featuredPerson.firstName} ${featuredPerson.lastName}`} detail={featuredPerson.summary} onClick={() => navigate({ name: "person", id: featuredPerson.id })} />
         <Discovery title="Parti à découvrir" value={featuredParty.acronym} detail={featuredParty.name} onClick={() => navigate({ name: "party", id: featuredParty.id })} />
         <Discovery title="Élection historique" value={featuredElection.name} detail={formatDate(featuredElection.date)} onClick={() => navigate({ name: "election", id: featuredElection.id })} />
-        <Discovery title="Ce jour-là" value="Dataset en construction" detail="Les événements calendaires seront enrichis sans données inventées." />
-        <Discovery title="Citation historique" value="NEEDS_SOURCE" detail="Aucune citation n'est affichée sans source vérifiable." />
-        <Discovery title="Saviez-vous que ?" value="Front populaire" detail="Cette entrée est modélisée comme coalition, pas comme parti." />
+        <Discovery
+          title={anniversary.exact ? "Ce jour-là" : "À cette période"}
+          value={anniversary.item?.title ?? "Explorer la chronologie"}
+          detail={anniversary.item ? formatDate(anniversary.item.date) : "Parcourir les événements documentés"}
+          onClick={() => navigate(anniversary.item?.page ?? { name: "timeline" })}
+        />
+        <Discovery
+          title="Citation historique"
+          value={`« ${featuredQuote.text} »`}
+          detail={`${featuredQuote.author} · ${featuredQuote.context} · Source : ${featuredQuoteSource?.publisher ?? "référence vérifiée"}`}
+          onClick={() => navigate({ name: "person", id: featuredQuote.personId })}
+        />
+        <Discovery
+          title="Transformation à découvrir"
+          value={relationFrom && relationTo ? `${relationFrom.acronym} → ${relationTo.acronym}` : "Généalogie des partis"}
+          detail={featuredRelation?.description ?? "Explorer les filiations politiques documentées."}
+          onClick={() => navigate({ name: "genealogy", partyId: relationFrom?.id ?? relationTo?.id })}
+        />
       </section>
-      <section className="notice">
+      <button className="notice home-notice" onClick={() => navigate({ name: "docs" })}>
         <h2>Clause historique</h2>
         <p>Les informations présentées ont une vocation historique et documentaire. Elles ne constituent ni une recommandation politique, ni une consigne de vote, ni une prise de position en faveur ou contre un parti ou une personnalité.</p>
-        <p>{favorites.size} favori(s) enregistré(s) localement.</p>
-      </section>
+        <p>{favorites.size} favori(s) enregistré(s) localement. Consulter la méthode éditoriale <ArrowRight size={17} aria-hidden="true" /></p>
+      </button>
     </>
   );
 }
 
-function Discovery({ title, value, detail, onClick }: { title: string; value: string; detail: string; onClick?: () => void }) {
-  const Tag = onClick ? "button" : "article";
+function Discovery({ title, value, detail, onClick }: { title: string; value: string; detail: string; onClick: () => void }) {
   return (
-    <Tag className="discovery-card" onClick={onClick as never}>
+    <button className="discovery-card" onClick={onClick}>
       <span>{title}</span>
       <strong>{value}</strong>
       <small>{detail}</small>
-    </Tag>
+      <span className="discovery-cta">Ouvrir <ArrowRight size={16} aria-hidden="true" /></span>
+    </button>
   );
 }
 
@@ -522,12 +574,18 @@ const governmentContexts: GovernmentContext[] = [
   { start: "2025-09-09", name: "Gouvernement Sébastien Lecornu", parties: ["party-lrem", "party-modem", "party-lr"] }
 ];
 
-function TimelinePage({ navigate }: { navigate: (page: Page) => void }) {
+function TimelinePage({ navigate, initialYear }: { navigate: (page: Page) => void; initialYear?: number }) {
   const [ideology, setIdeology] = useState<TimelineIdeologyFilter>("all");
   const [type, setType] = useState<TimelineTypeFilter>("all");
+  const [year, setYear] = useState(initialYear ? String(initialYear) : "all");
   const [openEntryId, setOpenEntryId] = useState<string | null>(null);
   const timelineEntries = useMemo(() => buildTimelineEntries(), []);
-  const entries = timelineEntries.filter((entry) => matchesTimelineIdeology(entry, ideology) && matchesTimelineType(entry, type));
+  const timelineYears = useMemo(() => [...new Set(timelineEntries.map((entry) => yearOf(entry.date)).filter((item): item is number => item !== undefined))].sort((left, right) => left - right), [timelineEntries]);
+  const entries = timelineEntries.filter((entry) => (
+    matchesTimelineIdeology(entry, ideology)
+    && matchesTimelineType(entry, type)
+    && (year === "all" || yearOf(entry.date) === Number(year))
+  ));
   return (
     <section className="page">
       <PageTitle title="Chronologie interactive" subtitle="Vue 1880-présent, filtrable par famille politique et par type d'événement." />
@@ -539,6 +597,10 @@ function TimelinePage({ navigate }: { navigate: (page: Page) => void }) {
         ))}
       </div>
       <div className="filter-row">
+        <select value={year} onChange={(event) => setYear(event.target.value)} aria-label="Filtrer par année">
+          <option value="all">Toutes les années</option>
+          {timelineYears.map((item) => <option key={item} value={item}>{item}</option>)}
+        </select>
         <select value={type} onChange={(event) => setType(event.target.value as TimelineTypeFilter)} aria-label="Filtrer par type d'événement">
           {timelineTypeFilters.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}
         </select>
@@ -1721,6 +1783,7 @@ function pathForPage(page: Page) {
   if (page.name === "event") return routeFor("event", page.id);
   if (page.name === "election") return routeFor("election", page.id);
   if (page.name === "genealogy" && page.partyId) return `/genealogie/${page.partyId.replace("party-", "")}`;
+  if (page.name === "timeline" && page.year) return `/timeline/${page.year}`;
   if (page.name === "settings") return "/parametres";
   return `/${page.name === "home" ? "" : page.name}`;
 }
@@ -1732,7 +1795,10 @@ function pageFromPath(path: string): Page {
   if (section === "evenements" && slug) return { name: "event", id: idFromSlug("event", slug) };
   if (section === "elections" && slug) return { name: "election", id: idFromSlug("election", slug) };
   if (section === "genealogie" && slug) return { name: "genealogy", partyId: idFromSlug("party", slug) };
-  if (section === "timeline") return { name: "timeline" };
+  if (section === "timeline") {
+    const year = Number.parseInt(slug ?? "", 10);
+    return { name: "timeline", year: Number.isFinite(year) ? year : undefined };
+  }
   if (section === "parties") return { name: "parties" };
   if (section === "persons" || section === "personnalites") return { name: "persons" };
   if (section === "elections") return { name: "elections" };

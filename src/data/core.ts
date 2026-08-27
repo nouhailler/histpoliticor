@@ -1803,7 +1803,7 @@ export const persons: Person[] = [
     summary: "Figure socialiste majeure de la IIIe République et acteur de l'unification socialiste.",
     parties: ["party-psf-1902", "party-sfio"],
     functions: ["député"],
-    sources: ["source-vie-publique-front-populaire", "source-francearchives-jaures"],
+    sources: ["source-vie-publique-front-populaire", "source-francearchives-jaures", "source-wikisource-jaures-1903"],
     dataStatus: "partially_verified"
   },
   {

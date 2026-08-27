@@ -99,6 +99,18 @@ export const sources: Source[] = [
     accessDate: "2026-08-24"
   },
   {
+    id: "source-wikisource-jaures-1903",
+    title: "Discours à la jeunesse (1903)",
+    author: "Jean Jaurès",
+    publisher: "Wikisource",
+    url: "https://fr.wikisource.org/wiki/Discours_%C3%A0_la_jeunesse_(1903)",
+    publicationDate: "1903-07",
+    accessDate: "2026-08-27",
+    type: "source_primaire",
+    license: "Domaine public ; transcription Wikisource sous CC BY-SA",
+    notes: "Transcription validée du discours prononcé lors de la distribution des prix du lycée d'Albi."
+  },
+  {
     id: "source-sanson-alliance-democratique",
     title: "L'Alliance républicaine démocratique : Association et/ou parti ?",
     author: "Rosemonde Sanson",
