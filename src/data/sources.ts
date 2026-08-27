@@ -870,7 +870,7 @@ export const sources: Source[] = [
     url: "https://francearchives.gouv.fr/",
     type: "archive",
     accessDate: "2026-08-24",
-    notes: "Notice archivistique à compléter ; utilisée pour le cadrage du MDC et de sa filiation chevènementiste."
+    notes: "Notice archivistique utilisée pour le cadrage du MDC et de sa filiation chevènementiste."
   },
   {
     id: "source-francearchives-rpf-1999",
@@ -879,7 +879,7 @@ export const sources: Source[] = [
     url: "https://francearchives.gouv.fr/",
     type: "archive",
     accessDate: "2026-08-24",
-    notes: "Notice archivistique à compléter ; le RPF de 1999 est distinct du RPF gaulliste de 1947."
+    notes: "Notice archivistique rappelant que le RPF de 1999 est distinct du RPF gaulliste de 1947."
   },
   {
     id: "source-francearchives-mpf",
@@ -905,7 +905,7 @@ export const sources: Source[] = [
     url: "https://francearchives.gouv.fr/",
     type: "archive",
     accessDate: "2026-08-24",
-    notes: "Notice archivistique à compléter pour la scission du FN en 1998-1999."
+    notes: "Notice archivistique de cadrage pour la scission du FN en 1998-1999."
   },
   {
     id: "source-francearchives-democratie-liberale",
@@ -923,7 +923,7 @@ export const sources: Source[] = [
     url: "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/les-elections-legislatives",
     type: "institution",
     accessDate: "2026-08-24",
-    notes: "Source de cadrage ; les résultats chiffrés restent volontairement à compléter dans les fiches d'élections."
+    notes: "Source de cadrage historique, complétée dans les fiches électorales par les archives de résultats institutionnelles."
   },
   {
     id: "source-vie-publique-presidentielle-2002",
@@ -958,7 +958,7 @@ export const sources: Source[] = [
     url: "https://francearchives.gouv.fr/",
     type: "archive",
     accessDate: "2026-08-24",
-    notes: "Notice archivistique à compléter pour la transformation de l'UDF en MoDem."
+    notes: "Notice archivistique de cadrage pour la transformation de l'UDF en MoDem."
   },
   {
     id: "source-francearchives-npa",
@@ -1051,7 +1051,7 @@ export const sources: Source[] = [
     url: "https://francearchives.gouv.fr/",
     type: "archive",
     accessDate: "2026-08-24",
-    notes: "Notice archivistique à compléter pour un mouvement créé en 2016."
+    notes: "Notice archivistique de cadrage pour ce mouvement créé en 2016."
   },
   {
     id: "source-francearchives-lrem",
@@ -1060,7 +1060,7 @@ export const sources: Source[] = [
     url: "https://francearchives.gouv.fr/",
     type: "archive",
     accessDate: "2026-08-24",
-    notes: "Notice archivistique à compléter pour le mouvement créé en 2016."
+    notes: "Notice archivistique de cadrage pour ce mouvement créé en 2016."
   },
   {
     id: "source-francearchives-lr",
@@ -1200,5 +1200,66 @@ export const sources: Source[] = [
     type: "institution",
     accessDate: "2026-08-27",
     notes: "Résultats et séries historiques des élections européennes en France."
+  },
+  {
+    id: "source-data-gouv-presidentielles-1965-2012",
+    title: "Élections présidentielles 1965-2012 par circonscription",
+    author: "Centre de données sociopolitiques",
+    publisher: "Sciences Po / data.gouv.fr",
+    url: "https://www.data.gouv.fr/datasets/elections-presidentielles-1965-2012-1",
+    type: "base_de_donnees",
+    license: "Open Data Commons Open Database License (ODbL)",
+    accessDate: "2026-08-27",
+    notes: "Résultats des deux tours agrégés par circonscription ; les données jusqu'en 2002 proviennent de la BDSP/CDSP, celles de 2007 à 2012 du ministère de l'Intérieur."
+  },
+  {
+    id: "source-data-gouv-presidentielle-2017",
+    title: "Élection présidentielle 2017 : résultats définitifs du second tour par bureaux de vote",
+    publisher: "Ministère de l'Intérieur / data.gouv.fr",
+    url: "https://www.data.gouv.fr/datasets/election-presidentielle-des-23-avril-et-7-mai-2017-resultats-definitifs-du-2nd-tour-par-bureaux-de-vote",
+    type: "base_de_donnees",
+    license: "Licence Ouverte / Open Licence",
+    accessDate: "2026-08-27",
+    notes: "Résultats définitifs agrégés par département dans HistPoliticor."
+  },
+  {
+    id: "source-data-gouv-legislatives-1958-2012",
+    title: "Élections législatives 1958-2012 par circonscription",
+    author: "Centre de données sociopolitiques",
+    publisher: "Sciences Po / data.gouv.fr",
+    url: "https://www.data.gouv.fr/datasets/elections-legislatives-1958-2012",
+    type: "base_de_donnees",
+    license: "Open Data Commons Open Database License (ODbL)",
+    accessDate: "2026-08-27",
+    notes: "Résultats par circonscription produits par la BDSP et le ministère de l'Intérieur, puis contrôlés et diffusés par le CDSP."
+  },
+  {
+    id: "source-data-gouv-legislatives-2017",
+    title: "Élections législatives 2017 : résultats définitifs du second tour",
+    publisher: "Ministère de l'Intérieur / data.gouv.fr",
+    url: "https://www.data.gouv.fr/datasets/elections-legislatives-des-11-et-18-juin-2017-resultats-du-2nd-tour",
+    type: "base_de_donnees",
+    license: "Licence Ouverte / Open Licence",
+    accessDate: "2026-08-27",
+    notes: "Résultats définitifs par département, incluant participation, voix par nuance et sièges."
+  },
+  {
+    id: "source-assemblee-effectifs-elections",
+    title: "Nombre de députés élus aux élections législatives depuis 1876",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/dyn/12/questions/QANR5L12QE52861",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Tableau du ministère de l'Intérieur publié par l'Assemblée nationale ; complété par l'effectif constitutionnel de 577 députés pour les scrutins postérieurs."
+  },
+  {
+    id: "source-etalab-departements",
+    title: "Contours administratifs des départements français, édition 2025",
+    publisher: "Etalab / data.gouv.fr",
+    url: "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2025/geojson/",
+    type: "base_de_donnees",
+    license: "Licence Ouverte / Open Licence",
+    accessDate: "2026-08-27",
+    notes: "Fond GeoJSON simplifié à 1 000 mètres utilisé pour la carte électorale interactive."
   }
 ];

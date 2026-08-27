@@ -10,7 +10,7 @@ Le projet est hébergé sur GitHub :
 
 ## État du corpus
 
-Le dataset est local. Au 27 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 171 sources. Les périodes déjà structurées comprennent notamment :
+Le dataset est local. Au 27 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 177 sources. Les périodes déjà structurées comprennent notamment :
 
 - 1880-1899 : consolidation républicaine, mouvement ouvrier, boulangisme et affaire Dreyfus ;
 - IIIe République : radicalisme, républicains modérés, socialismes, SFIO, ligues et Front populaire ;
@@ -27,6 +27,9 @@ Les coalitions et associations sont modélisées comme telles. Une coalition ne 
 - `src/data/core.ts` contient les régimes, périodes, familles politiques, partis, personnes, élections, événements et relations ;
 - `src/data/crises.ts` contient les crises supplémentaires, leur typologie, leurs conséquences et leurs sources ;
 - `src/data/electionResults.ts` contient les résumés publics et les sources institutionnelles des résultats des 43 élections ;
+- `src/data/electionDetails.ts` contient les dates de chaque tour, les règles d'applicabilité, les effectifs de l'Assemblée, le contexte économique et les prolongements politiques des 43 élections ;
+- `src/data/electionTerritorialResults.generated.json` contient les agrégations nationales et départementales de 24 seconds tours présidentiels et législatifs ;
+- `src/data/electionTerritorialResults.ts` charge ces données à la demande et expose leurs contrats TypeScript ;
 - `src/data/historicalQuotes.ts` contient le corpus de citations historiques affiché en rotation sur l'accueil ;
 - `src/data/index.ts` fusionne le corpus principal et le corpus de crises ;
 - `src/data/sources.ts` contient les références documentaires ;
@@ -39,9 +42,11 @@ Les coalitions et associations sont modélisées comme telles. Une coalition ne 
 - `scripts/fetch-party-logos.ts` recherche, contrôle et télécharge la sélection de logos Wikimedia Commons ;
 - `scripts/fetch-person-portraits.ts` rapproche les personnes avec Wikidata et télécharge les portraits libres de Wikimedia Commons ;
 - `scripts/fetch-person-profiles.ts` rapproche les personnes avec Wikipédia/Wikidata et génère les biographies et faits structurés ;
+- `scripts/generate-election-territorial-results.ts` agrège les archives CSV/XLSX ouvertes de Sciences Po et du ministère de l'Intérieur ;
 - `public/logos/parties` contient les 52 fichiers de logos servis localement ;
 - `public/images/persons` contient les 139 portraits servis localement ;
 - `public/icons` contient le logo maître, le favicon, l'icône iOS et les variantes PWA standard et maskable ;
+- `public/data/elections/departements-1000m.geojson` contient le fond cartographique Etalab simplifié, mis en cache par la PWA ;
 - `src/data/data.test.ts` contient les tests de cohérence du corpus et des logos ;
 - `src/lib/appUpdate.ts` détecte les nouvelles versions, conserve le réglage automatique et pilote l'activation du service worker ;
 - `src/lib/genealogy.ts` normalise les relations de filiation et calcule la disposition du graphe généalogique ;
@@ -61,7 +66,9 @@ La rubrique « Paramètres » affiche la version issue de `package.json` et la d
 
 Le volet d'une entrée et la fiche événement complète exposent dix ensembles historiques : élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres. Les associations sont calculées par chevauchement de dates, période et régime. Les champs techniques `importance`, `category` et `dataStatus` restent disponibles dans le modèle, mais ne sont pas affichés comme métadonnées publiques.
 
-Chaque fiche élection affiche désormais un bloc « Résultat du scrutin » distinct des conséquences politiques. Les 43 résumés publics sont reliés à des références institutionnelles de l'Assemblée nationale, du ministère de l'Intérieur, de Vie publique ou du Parlement européen. Les modes de scrutin ne contiennent plus de marqueur technique ; une valeur publique adaptée au type d'élection est utilisée lorsque le corpus ancien ne fournit pas de libellé spécifique.
+Chaque fiche élection est désormais un dossier complet. Elle affiche les dates et tours, le type et le mode de scrutin, le gouvernement en place, le contexte politique et économique, les candidats ou chefs de file, les partis et listes, le résultat national, la participation, l'abstention, les suffrages exprimés au second tour, les sièges de l'Assemblée lorsqu'ils s'appliquent, les conséquences, les réformes et les crises documentées dans les trois années suivantes. Les rubriques restent visibles avec une formulation « sans second tour » ou « non applicable » lorsque la notion ne correspond pas au scrutin.
+
+Les cartes de France sont interactives au clavier et à la souris. Le fond départemental vient d'Etalab. Pour les présidentielles, la couleur représente le candidat arrivé en tête au second tour. Pour les législatives, les circonscriptions ayant effectivement voté au second tour sont agrégées par département et classées par grand bloc politique ; la fiche rappelle que les sièges, et non un total national de voix, déterminent la majorité. Les résultats de 1965 à 2012 proviennent des jeux ODbL du CDSP/Sciences Po ; ceux de 2017 viennent des données définitives du ministère de l'Intérieur sous Licence Ouverte. Les scrutins à un tour conservent un fond neutre et n'inventent pas de second tour.
 
 La page « Généalogie des partis » produit un graphe orienté à partir des relations entre formations. L'utilisateur choisit une famille politique, active ou masque les créations, scissions, fusions, changements de nom et successions, sélectionne un parti ou une transformation et ajuste le zoom. Le moteur inverse les relations dont le modèle est exprimé depuis le successeur (`FOUNDED_FROM`, `SPLIT_FROM`, `SUCCESSOR_OF`) afin que la lecture visuelle reste toujours origine → nouvelle formation. Les partis disparus et actifs ont des états distincts ; les fiches complètes restent accessibles depuis le panneau contextuel.
 
@@ -100,7 +107,7 @@ npm run fetch:person-profiles -- --download
 ## Règles éditoriales
 
 1. Toute date précise, résultat électoral, citation ou filiation doit être relié à une source identifiable.
-2. Ne pas inventer de pourcentage ou de nombre de sièges. En cas d'absence de source consolidée, utiliser une note `TODO_DATA` et un `dataStatus` prudent.
+2. Ne pas inventer de pourcentage ou de nombre de sièges. En l'absence de source consolidée, formuler clairement la limite dans l'interface et la suivre hors des champs éditoriaux publics ; ne jamais afficher de marqueur technique tel que `TODO_DATA`.
 3. Distinguer les partis, coalitions, mouvements, ligues, associations et listes électorales avec le champ `status`.
 4. Ne pas projeter un nom contemporain sur une période antérieure. Exemple : le Front national reste nommé FN avant 2018 ; le Rassemblement national est une fiche distincte à partir de 2018.
 5. Signaler les corrections historiques dans `historicalNote`, notamment lorsqu'une liste utilisateur contient un anachronisme ou une attribution incertaine.
@@ -122,6 +129,7 @@ npm run dev
 npm run fetch:party-logos -- --download
 npm run fetch:person-portraits -- --download
 npm run fetch:person-profiles -- --download
+ELECTION_SOURCE_DIR=/chemin/vers/les-archives npm run generate:election-maps
 ```
 
 Le serveur de développement est généralement disponible sur `http://localhost:5173`. Pour tester le build compilé :
@@ -136,7 +144,7 @@ Le projet utilise Vite et Netlify. `netlify.toml` configure la compilation, la p
 
 ## Limites connues
 
-- Les fiches électorales privilégient un résultat national consolidé et lisible ; elles ne reproduisent pas encore toutes les tables par circonscription ou par candidat lorsqu'elles dépassent le périmètre encyclopédique de la fiche.
+- Les cartes départementales de second tour couvrent 24 présidentielles et législatives. Les législatives de 1932 et 1936 ne disposent pas encore d'une table territoriale libre suffisamment homogène dans le projet ; les régionales de 2010 se lisent d'abord à l'échelle régionale. Ces fiches affichent donc un fond neutre accompagné d'une explication éditoriale.
 - Plusieurs mouvements historiques disposent de sources de cadrage provisoires ; ils sont marqués `partially_verified` ou `unverified`.
 - 55 formations n'ont pas de logo libre suffisamment fiable dans la sélection actuelle et utilisent donc un monogramme.
 - 12 personnalités n'ont pas de portrait libre suffisamment fiable dans la sélection actuelle et utilisent donc un monogramme.

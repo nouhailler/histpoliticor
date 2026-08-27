@@ -19,7 +19,14 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { dataset } from "./data";
+import { electionDetails, type ElectionDetailData } from "./data/electionDetails";
 import { electionResults } from "./data/electionResults";
+import {
+  loadElectionTerritorialResults,
+  type DepartmentElectionResult,
+  type ElectionResultSeries,
+  type ElectionTerritorialResult
+} from "./data/electionTerritorialResults";
 import { historicalQuotes } from "./data/historicalQuotes";
 import { partyLogos } from "./data/partyLogos";
 import { personPortraits } from "./data/personPortraits";
@@ -1264,21 +1271,310 @@ function EventDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) {
 
 function ElectionDetail({ id, navigate, favorites, toggleFavorite }: DetailProps) {
   const election = byId(dataset.elections, id);
+  const detail = election ? electionDetails[election.id] : undefined;
+  const territorial = useElectionTerritorialResult(id, detail?.mapStatus === "territorial-data");
   if (!election) return <Missing />;
   const government = governmentNameAt(election.date);
   const result = electionResults[election.id];
-  const sourceIds = Array.from(new Set([...election.sources, ...(result?.sourceIds ?? [])]));
+  const sourceIds = Array.from(new Set([
+    ...election.sources,
+    ...(result?.sourceIds ?? []),
+    ...(detail?.sourceIds ?? []),
+    ...(territorial?.sourceIds ?? []),
+    "source-etalab-departements"
+  ]));
   return (
     <DetailLayout title={election.name} eyebrow={formatDate(election.date)} id={election.id} favorites={favorites} toggleFavorite={toggleFavorite}>
-      <p>{election.context}</p>
-      <FactGrid facts={[["Type", election.type], ["Gouvernement en place", government], ["Système électoral", electionSystemLabel(election)]]} />
-      {result ? <section className="election-result"><h2>Résultat du scrutin</h2><p>{result.summary}</p></section> : null}
+      <section className="election-context">
+        <h2>Contexte du scrutin</h2>
+        <p>{election.context}</p>
+      </section>
+      <FactGrid facts={[
+        ["Date ou tours", detail ? electionDatesLabel(detail.roundDates) : formatDate(election.date)],
+        ["Type d'élection", electionTypeLabel(election)],
+        ["Gouvernement en place", government],
+        ["Système électoral", electionSystemLabel(election)]
+      ]} />
+      {detail ? <ElectionKeyFigures election={election} detail={detail} territorial={territorial} /> : null}
+      {result ? <section className="election-result"><h2>Résultat national</h2><p>{result.summary}</p></section> : null}
+      {territorial ? <ElectionResultTable result={territorial} /> : null}
+      {detail ? <ElectionMap election={election} detail={detail} result={territorial} /> : null}
+      {detail ? <section className="election-analysis economic-context"><h2>Contexte économique</h2><p>{detail.economicContext}</p></section> : null}
       <section className="event-consequences"><h2>Conséquences politiques</h2><p>{election.consequences}</p></section>
-      <LinkedSection title="Partis liés" ids={election.parties} kind="party" navigate={navigate} />
-      <LinkedSection title="Personnalités liées" ids={election.persons} kind="person" navigate={navigate} />
+      {detail ? <section className="election-analysis reform-context"><h2>Réformes et prolongements</h2><p>{detail.reformContext}</p></section> : null}
+      <ElectionPoliticalSequence election={election} navigate={navigate} />
+      <LinkedSection title="Partis, coalitions et listes" ids={election.parties} kind="party" navigate={navigate} />
+      <LinkedSection title="Candidats, chefs de file et personnalités" ids={election.persons} kind="person" navigate={navigate} />
       <SourceSection ids={sourceIds} />
     </DetailLayout>
   );
+}
+
+function ElectionKeyFigures({ election, detail, territorial }: { election: Election; detail: ElectionDetailData; territorial?: ElectionTerritorialResult }) {
+  const turnout = territorial?.registered
+    ? territorial.voters / territorial.registered * 100
+    : detail.turnout;
+  const abstention = turnout === undefined ? detail.abstention : 100 - turnout;
+  const hasSecondRound = detail.roundDates.length > 1;
+  return (
+    <section className="election-key-section" aria-labelledby={`key-figures-${election.id}`}>
+      <div className="section-heading-row">
+        <div>
+          <p className="section-kicker">Corps électoral</p>
+          <h2 id={`key-figures-${election.id}`}>Chiffres clés</h2>
+        </div>
+        <span className="round-chip">{detail.decidingRoundLabel}</span>
+      </div>
+      <dl className="election-key-figures">
+        <div><dt>Participation</dt><dd>{turnout === undefined ? "Non consolidée" : formatPercent(turnout)}</dd></div>
+        <div><dt>Abstention</dt><dd>{abstention === undefined ? "Non consolidée" : formatPercent(abstention)}</dd></div>
+        <div>
+          <dt>Voix au second tour</dt>
+          <dd>{hasSecondRound ? territorial ? formatNumber(territorial.expressed) : "Non consolidées" : "Sans second tour"}</dd>
+        </div>
+        <div>
+          <dt>Sièges à l'Assemblée nationale</dt>
+          <dd>{detail.assemblySeats === undefined ? "Non applicable" : formatNumber(detail.assemblySeats)}</dd>
+        </div>
+      </dl>
+      <div className="election-metric-notes">
+        <p>{detail.secondRoundNote}</p>
+        <p>{detail.seatNote}</p>
+        {territorial && election.type === "legislative" ? <p>Participation calculée dans les circonscriptions appelées à voter au second tour.</p> : null}
+      </div>
+    </section>
+  );
+}
+
+function ElectionResultTable({ result }: { result: ElectionTerritorialResult }) {
+  const rows = result.series
+    .map((series) => ({ series, votes: result.nationalValues[series.id] ?? 0 }))
+    .filter((entry) => entry.votes > 0)
+    .sort((left, right) => right.votes - left.votes);
+  if (!rows.length) return null;
+  return (
+    <section className="election-breakdown">
+      <div className="section-heading-row">
+        <div>
+          <p className="section-kicker">{result.roundLabel}</p>
+          <h2>Résultats détaillés</h2>
+        </div>
+        <strong>{formatNumber(result.expressed)} exprimés</strong>
+      </div>
+      <div className="election-result-rows">
+        {rows.map(({ series, votes }) => {
+          const percent = result.expressed ? votes / result.expressed * 100 : 0;
+          return (
+            <div className="election-result-row" key={series.id}>
+              <div className="election-result-label">
+                <span className="map-swatch" style={{ backgroundColor: series.color }} aria-hidden="true" />
+                <strong>{series.label}</strong>
+                <span>{formatNumber(votes)} voix</span>
+                <b>{formatPercent(percent)}</b>
+              </div>
+              <div className="election-result-bar" aria-hidden="true"><span style={{ width: `${percent}%`, backgroundColor: series.color }} /></div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+interface DepartmentFeature {
+  type: "Feature";
+  properties: { code: string; nom: string; region: string };
+  geometry: { type: "Polygon" | "MultiPolygon"; coordinates: number[][][] | number[][][][] };
+}
+
+interface DepartmentCollection {
+  type: "FeatureCollection";
+  features: DepartmentFeature[];
+}
+
+let departmentMapPromise: Promise<DepartmentCollection> | undefined;
+
+function loadDepartmentMap() {
+  departmentMapPromise ??= fetch("/data/elections/departements-1000m.geojson")
+    .then((response) => {
+      if (!response.ok) throw new Error("Fond cartographique indisponible");
+      return response.json() as Promise<DepartmentCollection>;
+    });
+  return departmentMapPromise;
+}
+
+function ElectionMap({ election, detail, result }: { election: Election; detail: ElectionDetailData; result?: ElectionTerritorialResult }) {
+  const [map, setMap] = useState<DepartmentCollection>();
+  const [mapError, setMapError] = useState(false);
+  const [selectedCode, setSelectedCode] = useState<string>();
+
+  useEffect(() => {
+    let active = true;
+    loadDepartmentMap()
+      .then((value) => { if (active) setMap(value); })
+      .catch(() => { if (active) setMapError(true); });
+    return () => { active = false; };
+  }, []);
+
+  const metropolitanFeatures = map?.features.filter((feature) => /^(?:\d{2}|2A|2B)$/.test(feature.properties.code)) ?? [];
+  const selectedFeature = map?.features.find((feature) => feature.properties.code === selectedCode);
+  const selectedResult = selectedCode ? result?.departments[selectedCode] : undefined;
+  const overseasResults = map?.features
+    .filter((feature) => !/^(?:\d{2}|2A|2B)$/.test(feature.properties.code) && result?.departments[feature.properties.code])
+    .map((feature) => ({ feature, result: result?.departments[feature.properties.code] })) ?? [];
+
+  return (
+    <section className="election-map-section" aria-labelledby={`election-map-${election.id}`}>
+      <div className="section-heading-row">
+        <div>
+          <p className="section-kicker">Géographie électorale</p>
+          <h2 id={`election-map-${election.id}`}>Carte de France par département</h2>
+        </div>
+        <span className={`map-status map-status-${detail.mapStatus}`}>{detail.mapStatus === "territorial-data" ? "Données territoriales" : detail.mapStatus === "no-second-round" ? "Tour unique" : "Carte non consolidée"}</span>
+      </div>
+      <p className="map-explanation">{detail.mapExplanation}</p>
+      {result ? <MapLegend series={result.series} values={result.nationalValues} /> : null}
+      <div className={`france-map-shell${result ? " has-results" : " no-results"}`}>
+        {mapError ? <p className="map-loading">Le fond de carte n'a pas pu être chargé.</p> : map ? (
+          <svg className="france-map" viewBox="0 0 620 560" role="img" aria-label={`Carte électorale de ${election.name}`}>
+            {metropolitanFeatures.map((feature) => {
+              const departmentResult = result?.departments[feature.properties.code];
+              const winner = departmentResult ? winningSeries(departmentResult, result?.series ?? []) : undefined;
+              const label = departmentResult
+                ? `${feature.properties.nom} : ${winner?.label ?? "résultat indisponible"}`
+                : `${feature.properties.nom} : aucune donnée de second tour`;
+              return (
+                <path
+                  className={`department-shape${selectedCode === feature.properties.code ? " is-selected" : ""}`}
+                  d={departmentPath(feature.geometry)}
+                  fill={winner?.color ?? "#e5e0d6"}
+                  key={feature.properties.code}
+                  tabIndex={0}
+                  aria-label={label}
+                  onClick={() => setSelectedCode(feature.properties.code)}
+                  onFocus={() => setSelectedCode(feature.properties.code)}
+                  onMouseEnter={() => setSelectedCode(feature.properties.code)}
+                ><title>{label}</title></path>
+              );
+            })}
+          </svg>
+        ) : <p className="map-loading">Chargement du fond cartographique…</p>}
+        <DepartmentMapCard feature={selectedFeature} department={selectedResult} series={result?.series ?? []} hasSecondRound={detail.roundDates.length > 1} />
+      </div>
+      {overseasResults.length ? (
+        <div className="overseas-results" aria-label="Résultats ultramarins">
+          <strong>Outre-mer et collectivités</strong>
+          <div>{overseasResults.map(({ feature, result: department }) => {
+            const winner = department ? winningSeries(department, result?.series ?? []) : undefined;
+            return <button type="button" key={feature.properties.code} onClick={() => setSelectedCode(feature.properties.code)}><span className="map-swatch" style={{ backgroundColor: winner?.color }} />{feature.properties.nom}</button>;
+          })}</div>
+        </div>
+      ) : null}
+      <p className="map-attribution">Fond cartographique : Etalab, contours administratifs 2025, Licence Ouverte. Résultats : sources détaillées en fin de fiche.</p>
+    </section>
+  );
+}
+
+function MapLegend({ series, values }: { series: ElectionResultSeries[]; values: Record<string, number> }) {
+  const visible = series.filter((item) => (values[item.id] ?? 0) > 0);
+  return <div className="map-legend" aria-label="Légende de la carte">{visible.map((item) => <span key={item.id}><i style={{ backgroundColor: item.color }} />{item.label}</span>)}</div>;
+}
+
+function DepartmentMapCard({ feature, department, series, hasSecondRound }: { feature?: DepartmentFeature; department?: DepartmentElectionResult; series: ElectionResultSeries[]; hasSecondRound: boolean }) {
+  if (!feature) return <aside className="map-selection"><strong>Explorer la carte</strong><p>Sélectionnez un département avec la souris ou le clavier.</p></aside>;
+  if (!department) return <aside className="map-selection"><strong>{feature.properties.nom}</strong><p>{hasSecondRound ? "Aucun résultat départemental homogène n'est associé à ce scrutin." : "Ce scrutin ne comporte pas de second tour."}</p></aside>;
+  const rows = series
+    .map((item) => ({ item, votes: department.values[item.id] ?? 0 }))
+    .filter((entry) => entry.votes > 0)
+    .sort((left, right) => right.votes - left.votes);
+  return (
+    <aside className="map-selection">
+      <strong>{feature.properties.nom}</strong>
+      <span>{department.registered ? `${formatPercent(department.voters / department.registered * 100)} de participation` : "Participation non disponible"}</span>
+      <ol>{rows.map(({ item, votes }) => <li key={item.id}><span><i style={{ backgroundColor: item.color }} />{item.label}</span><b>{formatPercent(department.expressed ? votes / department.expressed * 100 : 0)}</b><small>{formatNumber(votes)} voix</small></li>)}</ol>
+    </aside>
+  );
+}
+
+function ElectionPoliticalSequence({ election, navigate }: { election: Election; navigate: (page: Page) => void }) {
+  const start = new Date(`${election.date}T00:00:00`).getTime();
+  const end = new Date(`${Number(election.date.slice(0, 4)) + 3}-12-31T23:59:59`).getTime();
+  const developments = dataset.events
+    .filter((event) => {
+      const time = new Date(`${event.date}T00:00:00`).getTime();
+      return time >= start && time <= end && event.regime === election.regime && ["crise", "reforme", "constitution"].includes(event.category);
+    })
+    .sort((left, right) => left.date.localeCompare(right.date))
+    .slice(0, 6);
+  return (
+    <section className="post-election-sequence">
+      <h2>Crises politiques et réformes dans la séquence suivante</h2>
+      <p>Ces événements surviennent dans les trois années qui suivent le scrutin. Leur proximité chronologique ne signifie pas, à elle seule, que l'élection en est la cause.</p>
+      {developments.length ? <div className="post-election-list">{developments.map((event) => (
+        <button type="button" key={event.id} onClick={() => navigate({ name: "event", id: event.id })}>
+          <span>{formatDate(event.date)}</span>
+          <strong>{event.title}</strong>
+          <small>{event.category === "crise" ? "Crise" : event.category === "constitution" ? "Évolution constitutionnelle" : "Réforme"}</small>
+        </button>
+      ))}</div> : <p className="empty-context">Aucune crise politique ou réforme distincte n'est documentée dans le corpus pour cette fenêtre de trois ans.</p>}
+    </section>
+  );
+}
+
+function useElectionTerritorialResult(id: string, enabled: boolean) {
+  const [result, setResult] = useState<ElectionTerritorialResult>();
+  useEffect(() => {
+    if (!enabled) {
+      setResult(undefined);
+      return;
+    }
+    let active = true;
+    loadElectionTerritorialResults().then((values) => {
+      if (active) setResult(values[id]);
+    }).catch(() => {
+      if (active) setResult(undefined);
+    });
+    return () => { active = false; };
+  }, [enabled, id]);
+  return result;
+}
+
+function electionDatesLabel(dates: string[]) {
+  if (dates.length === 1) return formatDate(dates[0]);
+  return dates.map((date, index) => `${index === 0 ? "1er tour" : `${index + 1}d tour`} : ${formatDate(date)}`).join(" · ");
+}
+
+function electionTypeLabel(election: Election) {
+  if (election.name.includes("européenne")) return "Élections européennes";
+  if (election.name.includes("régionale")) return "Élections régionales";
+  if (election.type === "legislative") return "Élections législatives";
+  if (election.type === "presidentielle") return "Élection présidentielle";
+  if (election.type === "referendum") return "Référendum";
+  return "Scrutin national";
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("fr-FR").format(Math.round(value));
+}
+
+function formatPercent(value: number) {
+  return `${new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(value)} %`;
+}
+
+function winningSeries(department: DepartmentElectionResult, series: ElectionResultSeries[]) {
+  const winner = Object.entries(department.values).sort((left, right) => right[1] - left[1])[0];
+  return winner ? series.find((item) => item.id === winner[0]) : undefined;
+}
+
+function departmentPath(geometry: DepartmentFeature["geometry"]) {
+  const polygons = geometry.type === "Polygon"
+    ? [geometry.coordinates as number[][][]]
+    : geometry.coordinates as number[][][][];
+  return polygons.map((polygon) => polygon.map((ring) => ring.map(([longitude, latitude], index) => {
+    const x = 22 + (longitude + 5.5) / 15.5 * 576;
+    const y = 18 + (51.5 - latitude) / 10.5 * 520;
+    return `${index ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join("") + "Z").join("")).join("");
 }
 
 function electionSystemLabel(election: Election) {
@@ -1575,7 +1871,7 @@ function DocumentationPage() {
       <h2>Politique éditoriale</h2>
       <p>L'application distingue les faits, les interprétations, les positions revendiquées et les données incertaines. Les catégories politiques sont contextualisées par période.</p>
       <h2>Limites</h2>
-      <p>Les résultats électoraux détaillés et les citations ne sont pas intégrés tant qu'une source contrôlée n'a pas été ajoutée au dataset.</p>
+      <p>Les 43 fiches électorales disposent d'un résultat national sourcé. Les cartes départementales couvrent les 24 seconds tours présidentiels et législatifs pour lesquels une table territoriale ouverte et homogène a pu être agrégée ; les autres scrutins expliquent directement leur périmètre.</p>
       <h2>Glossaire initial</h2>
       <p><strong>Scission</strong> : séparation d'une organisation en plusieurs ensembles. <strong>Coalition</strong> : alliance politique qui n'est pas nécessairement un parti.</p>
     </section>

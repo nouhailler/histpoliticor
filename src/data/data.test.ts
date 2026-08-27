@@ -3,6 +3,8 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { dataset } from ".";
 import { electionResults } from "./electionResults";
+import { electionDetails } from "./electionDetails";
+import territorialResults from "./electionTerritorialResults.generated.json";
 import { partyLogos } from "./partyLogos";
 import { personPortraits } from "./personPortraits";
 import { personProfiles } from "./personProfiles";
@@ -31,6 +33,52 @@ describe("dataset navigation requirements", () => {
       expect(result.sourceIds.length).toBeGreaterThan(0);
       result.sourceIds.forEach((sourceId) => expect(sourceIds.has(sourceId)).toBe(true));
       expect(election.electoralSystem ?? "").not.toMatch(/TODO_DATA|NEEDS_SOURCE/i);
+    }
+  });
+
+  it("provides a complete public dossier for every election", () => {
+    const electionIds = dataset.elections.map((election) => election.id).sort();
+    expect(Object.keys(electionDetails).sort()).toEqual(electionIds);
+
+    for (const election of dataset.elections) {
+      const detail = electionDetails[election.id];
+      expect(detail.roundDates.length).toBeGreaterThan(0);
+      expect(detail.economicContext.length).toBeGreaterThan(80);
+      expect(detail.reformContext.length).toBeGreaterThan(70);
+      expect(detail.mapExplanation.length).toBeGreaterThan(70);
+      expect(`${detail.secondRoundNote} ${detail.seatNote}`).not.toMatch(/TODO_DATA|NEEDS_SOURCE|à compléter/i);
+      if (detail.turnout !== undefined) {
+        expect(detail.turnout).toBeGreaterThan(0);
+        expect(detail.turnout).toBeLessThanOrEqual(100);
+        expect((detail.turnout + (detail.abstention ?? 0)).toFixed(2)).toBe("100.00");
+      }
+      if (election.type !== "legislative") expect(detail.assemblySeats).toBeUndefined();
+    }
+  });
+
+  it("ships sourced territorial second-round results and the local France map", () => {
+    const territorial = territorialResults as Record<string, {
+      registered: number;
+      voters: number;
+      expressed: number;
+      sourceIds: string[];
+      departments: Record<string, unknown>;
+    }>;
+    const mappedElectionIds = Object.entries(electionDetails)
+      .filter(([, detail]) => detail.mapStatus === "territorial-data")
+      .map(([id]) => id)
+      .sort();
+
+    expect(Object.keys(territorial).sort()).toEqual(mappedElectionIds);
+    expect(existsSync(path.resolve("public/data/elections/departements-1000m.geojson"))).toBe(true);
+    for (const result of Object.values(territorial)) {
+      expect(result.registered).toBeGreaterThan(0);
+      expect(result.voters).toBeGreaterThan(0);
+      expect(result.expressed).toBeGreaterThan(0);
+      expect(result.voters).toBeLessThanOrEqual(result.registered);
+      expect(result.expressed).toBeLessThanOrEqual(result.voters);
+      expect(Object.keys(result.departments).length).toBeGreaterThanOrEqual(80);
+      expect(result.sourceIds.length).toBeGreaterThan(0);
     }
   });
 

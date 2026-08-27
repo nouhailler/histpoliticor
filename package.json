@@ -11,7 +11,8 @@
     "validate:data": "tsx scripts/validate-data.ts",
     "fetch:party-logos": "tsx scripts/fetch-party-logos.ts",
     "fetch:person-portraits": "tsx scripts/fetch-person-portraits.ts",
-    "fetch:person-profiles": "tsx scripts/fetch-person-profiles.ts"
+    "fetch:person-profiles": "tsx scripts/fetch-person-profiles.ts",
+    "generate:election-maps": "node --import tsx scripts/generate-election-territorial-results.ts"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",

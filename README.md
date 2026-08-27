@@ -12,6 +12,8 @@ Le projet privilégie un dataset historique local, relationnel et traçable : le
 - filtres par orientation politique et type d'événement ;
 - fiches événement reliant élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres ;
 - fiches de partis, personnalités et élections avec navigation relationnelle et résultats électoraux sourcés ;
+- dossiers électoraux complets : dates et tours, type de scrutin, contexte politique et économique, candidats, partis, résultats, participation, abstention, voix du second tour, effectif de l'Assemblée, conséquences, réformes et crises ultérieures ;
+- cartes de France interactives par département pour 24 seconds tours présidentiels et législatifs, calculées à partir des données ouvertes de Sciences Po et du ministère de l'Intérieur ;
 - 151 biographies enrichies à partir de Wikipédia et Wikidata : récit biographique, lieux de naissance et de décès, nationalité, activités, formation, appartenances politiques et mandats datés ;
 - 139 portraits libres de personnalités servis localement, avec crédits Wikipédia/Wikimedia Commons ;
 - corpus de crises typées avec leurs conséquences et leurs sources ;
@@ -40,6 +42,7 @@ npm run preview
 npm run fetch:party-logos -- --download
 npm run fetch:person-portraits -- --download
 npm run fetch:person-profiles -- --download
+ELECTION_SOURCE_DIR=/chemin/vers/les-archives npm run generate:election-maps
 ```
 
 `npm run preview` sert localement le build de production.
@@ -65,7 +68,7 @@ public/       Manifest, service worker, icônes, logos, portraits locaux et page
 
 Les données principales sont locales et séparées des composants React. Les relations entre entités sont des données de première classe.
 
-État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 171 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
+État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 177 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
 
 Le corpus couvre notamment les recompositions suivantes :
 
@@ -82,6 +85,10 @@ La rubrique « Généalogie des partis » transforme les relations historiques e
 
 Les champs éditoriaux techniques tels que `importance`, `category` et `dataStatus` restent dans le modèle et servent à la structuration ou à la validation. Ils ne sont pas affichés comme tels dans les fiches publiques.
 
+Les fiches électorales distinguent les informations absentes des informations qui ne s'appliquent pas au scrutin. Un référendum ou une élection européenne à un tour affiche ainsi « sans second tour » ; un scrutin qui ne renouvelle pas l'Assemblée indique « non applicable » pour les sièges, sans masquer la rubrique. Les résultats territoriaux sont chargés à la demande afin de ne pas alourdir l'accueil.
+
+Les cartes utilisent le fond simplifié des départements publié par Etalab sous Licence Ouverte. Les présidentielles de 1965 à 2012 et les législatives de 1958 à 2012 sont agrégées depuis les jeux ODbL du Centre de données sociopolitiques de Sciences Po ; les scrutins de 2017 utilisent les fichiers définitifs du ministère de l'Intérieur sur data.gouv.fr. Pour les législatives, la couleur indique le bloc politique arrivé en tête en additionnant les voix des circonscriptions du département appelées à voter au second tour. Pour une élection à un tour, aucune carte de second tour artificielle n'est produite.
+
 ## Logos et crédits
 
 La page « Partis et mouvements » utilise les logos libres dont l'identification a pu être contrôlée. Les formations sans fichier libre suffisamment fiable utilisent un monogramme neutre ; aucun logo n'est inventé ou associé automatiquement à partir du seul sigle.
@@ -94,6 +101,12 @@ Les fiches « Personnalités » affichent l'un des 139 portraits locaux lorsque 
 
 Les 151 fiches comportent aussi un profil biographique enrichi : l'introduction de la notice Wikipédia française, les lieux de naissance et de décès, la nationalité, les activités, la formation, les appartenances politiques et les fonctions ou mandats datés disponibles dans Wikidata. La provenance, la licence Creative Commons et la date de récupération sont affichées sur chaque fiche. Ces informations complètent le résumé éditorial local sans remplacer les relations historiques propres à HistPoliticor.
 
+## Données électorales et cartographiques
+
+Les agrégations de `src/data/electionTerritorialResults.generated.json` dérivées des jeux Sciences Po/CDSP sont diffusées selon l'Open Data Commons Open Database License (ODbL). Les résultats 2017 du ministère de l'Intérieur et le fond départemental Etalab sont sous Licence Ouverte. Les producteurs, pages de téléchargement et licences sont enregistrés dans `src/data/sources.ts` et affichés sur les fiches.
+
+Le générateur `scripts/generate-election-territorial-results.ts` accepte `ELECTION_SOURCE_DIR` pour désigner un répertoire contenant les archives sources décompressées. Il répare seulement les décalages numériques documentés du CSV 1978, agrège les circonscriptions ou bureaux au département et ne modifie pas les résultats politiques.
+
 Pour ajouter une fiche :
 
 1. Ajouter l'entité dans `src/data/core.ts` ou `src/data/documents.ts`.
@@ -104,7 +117,7 @@ Pour ajouter une fiche :
 6. Régénérer les profils avec `npm run fetch:person-profiles -- --download` après l'ajout d'une personnalité.
 7. Lancer `npm run validate:data`.
 
-Ne pas intégrer de résultat électoral, citation ou date précise sans source vérifiable. Les marqueurs de travail comme `TODO_DATA` ou `NEEDS_SOURCE` doivent rester hors des champs affichés au public ; utiliser `dataStatus: "unverified"` et le suivi éditorial interne lorsqu'une information reste à contrôler.
+Ne pas intégrer de résultat électoral, citation ou date précise sans source vérifiable. Les marqueurs de travail comme `TODO_DATA` ou `NEEDS_SOURCE` ne doivent jamais être placés dans les champs éditoriaux affichables ; une limite de couverture doit être formulée publiquement et précisément, puis suivie séparément dans le travail éditorial.
 
 Les listes historiques fournies comme matériau de travail peuvent contenir des anachronismes ou des approximations. Ils doivent être corrigés dans `historicalNote` et ne doivent pas être propagés silencieusement dans les données.
 
