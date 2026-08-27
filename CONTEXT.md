@@ -10,7 +10,7 @@ Le projet est hébergé sur GitHub :
 
 ## État du corpus
 
-Le dataset est local. Au 27 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 160 sources. Les périodes déjà structurées comprennent notamment :
+Le dataset est local. Au 27 août 2026, il contient 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 171 sources. Les périodes déjà structurées comprennent notamment :
 
 - 1880-1899 : consolidation républicaine, mouvement ouvrier, boulangisme et affaire Dreyfus ;
 - IIIe République : radicalisme, républicains modérés, socialismes, SFIO, ligues et Front populaire ;
@@ -26,6 +26,8 @@ Les coalitions et associations sont modélisées comme telles. Une coalition ne 
 
 - `src/data/core.ts` contient les régimes, périodes, familles politiques, partis, personnes, élections, événements et relations ;
 - `src/data/crises.ts` contient les crises supplémentaires, leur typologie, leurs conséquences et leurs sources ;
+- `src/data/electionResults.ts` contient les résumés publics et les sources institutionnelles des résultats des 43 élections ;
+- `src/data/historicalQuotes.ts` contient le corpus de citations historiques affiché en rotation sur l'accueil ;
 - `src/data/index.ts` fusionne le corpus principal et le corpus de crises ;
 - `src/data/sources.ts` contient les références documentaires ;
 - `src/data/documents.ts` contient les documents et textes politiques ;
@@ -51,13 +53,15 @@ Les relations sont des objets de données à part entière. Elles utilisent nota
 
 La chronologie est générée à partir des événements, des élections, des dates de création des partis et des relations datées. Elle propose des filtres idéologiques et des filtres par type.
 
-L'accueil calcule chaque jour une sélection déterministe d'événements, personnalités, partis, élections et transformations disposant de sources. « Ce jour-là » privilégie les entrées dont le mois et le jour correspondent à la date courante, puis une entrée du même mois. La citation de Jean Jaurès est reliée à sa transcription primaire sur Wikisource. Toutes les cartes, les jalons 1905, 1920, 1936 et 1958, ainsi que la clause historique sont des zones interactives. Les jalons ouvrent une route de chronologie annuelle (`/timeline/:année`) et initialisent le filtre d'année correspondant.
+L'accueil calcule chaque jour une sélection déterministe d'événements, personnalités, partis, élections et transformations disposant de sources. « Ce jour-là » privilégie les entrées dont le mois et le jour correspondent à la date courante, puis une entrée du même mois. Dix citations de Jean Jaurès, Paul Lafargue, Jules Guesde et Aristide Briand sont proposées en rotation quotidienne ; chacune est reliée à la fiche de son auteur et à une transcription primaire du domaine public sur Wikisource. Toutes les cartes, les jalons 1905, 1920, 1936 et 1958, ainsi que la clause historique sont des zones interactives. Les jalons ouvrent une route de chronologie annuelle (`/timeline/:année`) et initialisent le filtre d'année correspondant.
 
 La navigation principale utilise un menu hamburger disponible sur mobile et ordinateur. Ses entrées sont regroupées en trois catégories : exploration historique, acteurs politiques et documentation. Le panneau gère le focus clavier, la touche Échap, l'état actif et la fermeture par clic hors du menu.
 
 La rubrique « Paramètres » affiche la version issue de `package.json` et la date du build. `vite.config.ts` injecte ces informations dans le bundle et génère `version.json`. La vérification automatique se fait au démarrage, au retour en ligne, lorsque l'application redevient visible et toutes les 30 minutes. Une nouvelle version déclenche la mise à jour du service worker puis le rechargement de l'application ; le réglage est conservé dans `localStorage` et peut être désactivé.
 
 Le volet d'une entrée et la fiche événement complète exposent dix ensembles historiques : élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres. Les associations sont calculées par chevauchement de dates, période et régime. Les champs techniques `importance`, `category` et `dataStatus` restent disponibles dans le modèle, mais ne sont pas affichés comme métadonnées publiques.
+
+Chaque fiche élection affiche désormais un bloc « Résultat du scrutin » distinct des conséquences politiques. Les 43 résumés publics sont reliés à des références institutionnelles de l'Assemblée nationale, du ministère de l'Intérieur, de Vie publique ou du Parlement européen. Les modes de scrutin ne contiennent plus de marqueur technique ; une valeur publique adaptée au type d'élection est utilisée lorsque le corpus ancien ne fournit pas de libellé spécifique.
 
 La page « Généalogie des partis » produit un graphe orienté à partir des relations entre formations. L'utilisateur choisit une famille politique, active ou masque les créations, scissions, fusions, changements de nom et successions, sélectionne un parti ou une transformation et ajuste le zoom. Le moteur inverse les relations dont le modèle est exprimé depuis le successeur (`FOUNDED_FROM`, `SPLIT_FROM`, `SUCCESSOR_OF`) afin que la lecture visuelle reste toujours origine → nouvelle formation. Les partis disparus et actifs ont des états distincts ; les fiches complètes restent accessibles depuis le panneau contextuel.
 
@@ -132,7 +136,7 @@ Le projet utilise Vite et Netlify. `netlify.toml` configure la compilation, la p
 
 ## Limites connues
 
-- Certains résultats électoraux détaillés restent volontairement non chiffrés tant qu'une source officielle homogène n'est pas intégrée.
+- Les fiches électorales privilégient un résultat national consolidé et lisible ; elles ne reproduisent pas encore toutes les tables par circonscription ou par candidat lorsqu'elles dépassent le périmètre encyclopédique de la fiche.
 - Plusieurs mouvements historiques disposent de sources de cadrage provisoires ; ils sont marqués `partially_verified` ou `unverified`.
 - 55 formations n'ont pas de logo libre suffisamment fiable dans la sélection actuelle et utilisent donc un monogramme.
 - 12 personnalités n'ont pas de portrait libre suffisamment fiable dans la sélection actuelle et utilisent donc un monogramme.

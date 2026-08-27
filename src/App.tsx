@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { dataset } from "./data";
+import { electionResults } from "./data/electionResults";
+import { historicalQuotes } from "./data/historicalQuotes";
 import { partyLogos } from "./data/partyLogos";
 import { personPortraits } from "./data/personPortraits";
 import { personProfiles, type PersonProfile, type PersonProfilePosition } from "./data/personProfiles";
@@ -253,15 +255,6 @@ function renderPage(page: Page, navigate: (page: Page) => void, favorites: Set<s
 }
 
 const archiveYears = [1905, 1920, 1936, 1958];
-const historicalQuotes = [
-  {
-    text: "Le courage c’est de chercher la vérité et de la dire.",
-    author: "Jean Jaurès",
-    context: "Discours à la jeunesse, Albi, juillet 1903",
-    personId: "person-jean-jaures",
-    sourceId: "source-wikisource-jaures-1903"
-  }
-];
 
 function HomePage({ navigate, favorites }: { navigate: (page: Page) => void; favorites: Set<string> }) {
   const today = useMemo(() => new Date(), []);
@@ -325,7 +318,7 @@ function HomePage({ navigate, favorites }: { navigate: (page: Page) => void; fav
         <Discovery
           title="Citation historique"
           value={`« ${featuredQuote.text} »`}
-          detail={`${featuredQuote.author} · ${featuredQuote.context} · Source : ${featuredQuoteSource?.publisher ?? "référence vérifiée"}`}
+          detail={`${featuredQuote.author} · ${featuredQuote.context} · Source : ${featuredQuoteSource?.publisher ?? "référence vérifiée"} · ${historicalQuotes.length} citations en rotation`}
           onClick={() => navigate({ name: "person", id: featuredQuote.personId })}
         />
         <Discovery
@@ -1273,17 +1266,27 @@ function ElectionDetail({ id, navigate, favorites, toggleFavorite }: DetailProps
   const election = byId(dataset.elections, id);
   if (!election) return <Missing />;
   const government = governmentNameAt(election.date);
+  const result = electionResults[election.id];
+  const sourceIds = Array.from(new Set([...election.sources, ...(result?.sourceIds ?? [])]));
   return (
     <DetailLayout title={election.name} eyebrow={formatDate(election.date)} id={election.id} favorites={favorites} toggleFavorite={toggleFavorite}>
       <p>{election.context}</p>
-      <FactGrid facts={[["Type", election.type], ["Gouvernement en place", government], ["Système électoral", election.electoralSystem ?? "Non renseigné"]]} />
-      <p className="method-note">{election.resultsNote}</p>
-      <p>{election.consequences}</p>
+      <FactGrid facts={[["Type", election.type], ["Gouvernement en place", government], ["Système électoral", electionSystemLabel(election)]]} />
+      {result ? <section className="election-result"><h2>Résultat du scrutin</h2><p>{result.summary}</p></section> : null}
+      <section className="event-consequences"><h2>Conséquences politiques</h2><p>{election.consequences}</p></section>
       <LinkedSection title="Partis liés" ids={election.parties} kind="party" navigate={navigate} />
       <LinkedSection title="Personnalités liées" ids={election.persons} kind="person" navigate={navigate} />
-      <SourceSection ids={election.sources} />
+      <SourceSection ids={sourceIds} />
     </DetailLayout>
   );
+}
+
+function electionSystemLabel(election: Election) {
+  if (election.electoralSystem && !/TODO_DATA|NEEDS_SOURCE/i.test(election.electoralSystem)) return election.electoralSystem;
+  if (election.type === "presidentielle") return "Suffrage universel direct, scrutin majoritaire à deux tours.";
+  if (election.type === "referendum") return "Consultation nationale au suffrage universel direct.";
+  if (election.type === "legislative") return "Scrutin législatif national selon les règles en vigueur à la date du vote.";
+  return "Scrutin national.";
 }
 
 function GenealogyPage({ navigate, partyId = "party-rpf" }: { navigate: (page: Page) => void; partyId?: string }) {

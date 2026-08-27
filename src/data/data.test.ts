@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { dataset } from ".";
+import { electionResults } from "./electionResults";
 import { partyLogos } from "./partyLogos";
 import { personPortraits } from "./personPortraits";
 import { personProfiles } from "./personProfiles";
@@ -15,6 +16,22 @@ describe("dataset navigation requirements", () => {
     expect(dataset.parties.some((party) => party.id === "party-pcf")).toBe(true);
     expect(dataset.events.some((event) => event.id === "event-congres-tours")).toBe(true);
     expect(dataset.elections.some((election) => election.id === "election-legislatives-1936")).toBe(true);
+  });
+
+  it("publishes a sourced, audience-facing result for every election", () => {
+    const electionIds = dataset.elections.map((election) => election.id).sort();
+    const resultIds = Object.keys(electionResults).sort();
+    const sourceIds = new Set(dataset.sources.map((source) => source.id));
+
+    expect(resultIds).toEqual(electionIds);
+    for (const election of dataset.elections) {
+      const result = electionResults[election.id];
+      expect(result.summary.length).toBeGreaterThan(40);
+      expect(result.summary).not.toMatch(/TODO_DATA|NEEDS_SOURCE|à compléter|ne (?:sont|sera) pas intégr/i);
+      expect(result.sourceIds.length).toBeGreaterThan(0);
+      result.sourceIds.forEach((sourceId) => expect(sourceIds.has(sourceId)).toBe(true));
+      expect(election.electoralSystem ?? "").not.toMatch(/TODO_DATA|NEEDS_SOURCE/i);
+    }
   });
 
   it("links SFIO to PCF through a first-class relation", () => {

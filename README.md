@@ -7,11 +7,11 @@ Le projet privilégie un dataset historique local, relationnel et traçable : le
 ## Fonctionnalités principales
 
 - chronologie interactive générée à partir des événements, élections, partis et relations ;
-- accueil dynamique renouvelé chaque jour à partir du corpus, avec anniversaires historiques, citation sourcée et jalons annuels cliquables ;
+- accueil dynamique renouvelé chaque jour à partir du corpus, avec anniversaires historiques, rotation de 10 citations issues de sources primaires et jalons annuels cliquables ;
 - arbre généalogique interactif des partis, filtrable par famille politique et par transformation (création, scission, fusion, changement de nom ou succession), avec zoom et fiches contextuelles ;
 - filtres par orientation politique et type d'événement ;
 - fiches événement reliant élections, créations de partis, scissions, fusions, changements de nom, présidents, gouvernements, crises, référendums et guerres ;
-- fiches de partis, personnalités et élections avec navigation relationnelle ;
+- fiches de partis, personnalités et élections avec navigation relationnelle et résultats électoraux sourcés ;
 - 151 biographies enrichies à partir de Wikipédia et Wikidata : récit biographique, lieux de naissance et de décès, nationalité, activités, formation, appartenances politiques et mandats datés ;
 - 139 portraits libres de personnalités servis localement, avec crédits Wikipédia/Wikimedia Commons ;
 - corpus de crises typées avec leurs conséquences et leurs sources ;
@@ -65,7 +65,7 @@ public/       Manifest, service worker, icônes, logos, portraits locaux et page
 
 Les données principales sont locales et séparées des composants React. Les relations entre entités sont des données de première classe.
 
-État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 160 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
+État actuel du corpus : 109 partis et mouvements, 151 personnalités, 43 élections, 185 événements et 171 sources. La chronologie commence en 1880 afin de contextualiser les organisations apparues avant 1900.
 
 Le corpus couvre notamment les recompositions suivantes :
 
@@ -104,7 +104,7 @@ Pour ajouter une fiche :
 6. Régénérer les profils avec `npm run fetch:person-profiles -- --download` après l'ajout d'une personnalité.
 7. Lancer `npm run validate:data`.
 
-Ne pas intégrer de résultat électoral, citation ou date précise sans source vérifiable. Utiliser `TODO_DATA`, `NEEDS_SOURCE` ou `dataStatus: "unverified"` si une information reste à contrôler.
+Ne pas intégrer de résultat électoral, citation ou date précise sans source vérifiable. Les marqueurs de travail comme `TODO_DATA` ou `NEEDS_SOURCE` doivent rester hors des champs affichés au public ; utiliser `dataStatus: "unverified"` et le suivi éditorial interne lorsqu'une information reste à contrôler.
 
 Les listes historiques fournies comme matériau de travail peuvent contenir des anachronismes ou des approximations. Ils doivent être corrigés dans `historicalNote` et ne doivent pas être propagés silencieusement dans les données.
 

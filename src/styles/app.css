@@ -489,6 +489,9 @@ h2 { font-size: 1.1rem; margin: 0 0 10px; }
 .event-consequences { margin: 18px 0; border-left: 4px solid var(--oxide); padding: 10px 14px; background: var(--paper); }
 .event-consequences h2 { margin: 0 0 6px; font-size: 1rem; }
 .event-consequences p { margin: 0; }
+.election-result { margin: 18px 0; border-left: 4px solid var(--gold); padding: 14px 16px; background: var(--paper); }
+.election-result h2 { margin: 0 0 7px; font-size: 1.05rem; }
+.election-result p { margin: 0; font-size: 1.02rem; line-height: 1.6; }
 .linked-section { margin-top: 22px; }
 .source-list { padding-left: 18px; line-height: 1.6; }
 .relation-row { display: block; width: 100%; margin-bottom: 10px; }

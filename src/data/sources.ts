@@ -111,6 +111,42 @@ export const sources: Source[] = [
     notes: "Transcription validée du discours prononcé lors de la distribution des prix du lycée d'Albi."
   },
   {
+    id: "source-wikisource-lafargue-paresse",
+    title: "Le Droit à la paresse",
+    author: "Paul Lafargue",
+    publisher: "Wikisource",
+    url: "https://fr.wikisource.org/wiki/Le_Droit_%C3%A0_la_paresse",
+    publicationDate: "1883",
+    accessDate: "2026-08-27",
+    type: "source_primaire",
+    license: "Domaine public ; transcription Wikisource sous CC BY-SA",
+    notes: "Transcription validée de l'édition de 1883."
+  },
+  {
+    id: "source-wikisource-guesde-deux-methodes",
+    title: "Les Deux Méthodes",
+    author: "Jules Guesde",
+    publisher: "Wikisource",
+    url: "https://fr.wikisource.org/wiki/Les_Deux_M%C3%A9thodes_(Guesde)",
+    publicationDate: "1900-11-26",
+    accessDate: "2026-08-27",
+    type: "source_primaire",
+    license: "Domaine public ; transcription Wikisource sous CC BY-SA",
+    notes: "Transcription validée du discours contradictoire prononcé à Lille."
+  },
+  {
+    id: "source-wikisource-briand-1927",
+    title: "Message au peuple américain",
+    author: "Aristide Briand",
+    publisher: "Wikisource",
+    url: "https://fr.wikisource.org/wiki/Message_au_peuple_am%C3%A9ricain_(Aristide_Briand,_6_avril_1927)",
+    publicationDate: "1927-04-06",
+    accessDate: "2026-08-27",
+    type: "source_primaire",
+    license: "Domaine public ; transcription Wikisource sous CC BY-SA",
+    notes: "Transcription validée du message adressé au peuple américain."
+  },
+  {
     id: "source-sanson-alliance-democratique",
     title: "L'Alliance républicaine démocratique : Association et/ou parti ?",
     author: "Rosemonde Sanson",
@@ -1093,5 +1129,76 @@ export const sources: Source[] = [
     url: "https://www.vie-publique.fr/",
     type: "institution",
     accessDate: "2026-08-24"
+  },
+  {
+    id: "source-assemblee-histoire-elections",
+    title: "Troisième République : histoire politique et élections",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/troisieme-republique",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Source institutionnelle de synthèse pour les résultats politiques des élections législatives de l'entre-deux-guerres."
+  },
+  {
+    id: "source-assemblee-quatrieme-republique-elections",
+    title: "La Quatrième République : élections et instabilité parlementaire",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/dyn/histoire-et-patrimoine/quatrieme-republique/un-regime-instable-1947-1951",
+    type: "institution",
+    accessDate: "2026-08-27"
+  },
+  {
+    id: "source-assemblee-legislatives-resultats",
+    title: "Résultats des élections législatives sous la Ve République",
+    publisher: "Assemblée nationale",
+    url: "https://www.assemblee-nationale.fr/histoire/leg5repnew.asp",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Tableaux institutionnels des voix, pourcentages, sièges et groupes parlementaires."
+  },
+  {
+    id: "source-interieur-archives-resultats",
+    title: "Archives des résultats des élections en France",
+    publisher: "Ministère de l'Intérieur",
+    url: "https://www.archives-resultats-elections.interieur.gouv.fr/",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Résultats nationaux officiels des scrutins contemporains."
+  },
+  {
+    id: "source-vie-publique-referendums",
+    title: "Le référendum en France en sept questions",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/questions-reponses/290760-le-referendum-en-france-en-sept-questions",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Tableau récapitulatif des référendums de la Ve République établi à partir des proclamations du Conseil constitutionnel."
+  },
+  {
+    id: "source-vie-publique-revisions-constitutionnelles",
+    title: "Les révisions constitutionnelles de la Ve République",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/files/2024-04/604240050_INT_Constitution-1958_Maj-2024_Web_Extrait.pdf",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Synthèse institutionnelle comprenant le résultat du référendum constitutionnel du 28 septembre 1958."
+  },
+  {
+    id: "source-vie-publique-resultats-presidentielles",
+    title: "Cartes des résultats des élections présidentielles",
+    publisher: "Vie publique",
+    url: "https://www.vie-publique.fr/bibliotheque-multimedia?type_1=carte",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Collection institutionnelle de cartes et résultats nationaux par tour depuis 1965, à partir des données du ministère de l'Intérieur."
+  },
+  {
+    id: "source-parlement-europeen-resultats",
+    title: "Résultats des élections européennes : France",
+    publisher: "Parlement européen",
+    url: "https://results.elections.europa.eu/fr/resultats-nationaux/france/1979-1984/session-constitutive/",
+    type: "institution",
+    accessDate: "2026-08-27",
+    notes: "Résultats et séries historiques des élections européennes en France."
   }
 ];
