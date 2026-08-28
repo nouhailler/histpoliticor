@@ -11227,6 +11227,28 @@
           "emmanuel-macron": 47983,
           "marine-le-pen": 28074
         }
+      },
+      "2A": {
+        "name": "Corse-Du-Sud",
+        "registered": 108760,
+        "voters": 70248,
+        "expressed": 61554,
+        "blankInvalid": 8694,
+        "values": {
+          "emmanuel-macron": 31139,
+          "marine-le-pen": 30415
+        }
+      },
+      "2B": {
+        "name": "Haute-Corse",
+        "registered": 124873,
+        "voters": 79234,
+        "expressed": 68247,
+        "blankInvalid": 10987,
+        "values": {
+          "emmanuel-macron": 35680,
+          "marine-le-pen": 32567
+        }
       }
     },
     "sourceIds": [
@@ -11416,20 +11438,6 @@
           "left": 101534,
           "right": 1649,
           "presidential": 23748
-        }
-      },
-      "20": {
-        "name": "Corse",
-        "registered": 161781,
-        "voters": 94930,
-        "expressed": 93671,
-        "blankInvalid": 1259,
-        "values": {
-          "left": 20921,
-          "center": 35137,
-          "far-right": 139,
-          "presidential": 26699,
-          "right": 10775
         }
       },
       "21": {
@@ -12428,6 +12436,34 @@
           "left": 51192,
           "presidential": 20385
         }
+      },
+      "2A": {
+        "name": "Corse-du-Sud",
+        "registered": 161781,
+        "voters": 94930,
+        "expressed": 93671,
+        "blankInvalid": 1259,
+        "values": {
+          "left": 20921,
+          "center": 35137,
+          "far-right": 139,
+          "presidential": 26699,
+          "right": 10775
+        }
+      },
+      "2B": {
+        "name": "Haute-Corse",
+        "registered": 161781,
+        "voters": 94930,
+        "expressed": 93671,
+        "blankInvalid": 1259,
+        "values": {
+          "left": 20921,
+          "center": 35137,
+          "far-right": 139,
+          "presidential": 26699,
+          "right": 10775
+        }
       }
     },
     "sourceIds": [
@@ -12611,19 +12647,6 @@
         "values": {
           "left": 92326,
           "presidential": 22239
-        }
-      },
-      "20": {
-        "name": "Corse",
-        "registered": 109472,
-        "voters": 75877,
-        "expressed": 75272,
-        "blankInvalid": 605,
-        "values": {
-          "left": 38611,
-          "presidential": 6147,
-          "right": 7087,
-          "center": 23427
         }
       },
       "21": {
@@ -13575,6 +13598,32 @@
           "center": 7860,
           "presidential": 7262
         }
+      },
+      "2A": {
+        "name": "Corse-du-Sud",
+        "registered": 109472,
+        "voters": 75877,
+        "expressed": 75272,
+        "blankInvalid": 605,
+        "values": {
+          "left": 38611,
+          "presidential": 6147,
+          "right": 7087,
+          "center": 23427
+        }
+      },
+      "2B": {
+        "name": "Haute-Corse",
+        "registered": 109472,
+        "voters": 75877,
+        "expressed": 75272,
+        "blankInvalid": 605,
+        "values": {
+          "left": 38611,
+          "presidential": 6147,
+          "right": 7087,
+          "center": 23427
+        }
       }
     },
     "sourceIds": [
@@ -13752,17 +13801,6 @@
         "values": {
           "left": 76103,
           "presidential": 57280
-        }
-      },
-      "20": {
-        "name": "Corse",
-        "registered": 50591,
-        "voters": 37316,
-        "expressed": 36820,
-        "blankInvalid": 496,
-        "values": {
-          "left": 18213,
-          "presidential": 18607
         }
       },
       "21": {
@@ -14743,6 +14781,28 @@
           "left": 43868,
           "presidential": 28625
         }
+      },
+      "2A": {
+        "name": "Corse-du-Sud",
+        "registered": 50591,
+        "voters": 37316,
+        "expressed": 36820,
+        "blankInvalid": 496,
+        "values": {
+          "left": 18213,
+          "presidential": 18607
+        }
+      },
+      "2B": {
+        "name": "Haute-Corse",
+        "registered": 50591,
+        "voters": 37316,
+        "expressed": 36820,
+        "blankInvalid": 496,
+        "values": {
+          "left": 18213,
+          "presidential": 18607
+        }
       }
     },
     "sourceIds": [
@@ -14917,14 +14977,6 @@
           "left": 24186,
           "presidential": 13213
         }
-      },
-      "20": {
-        "name": "Corse",
-        "registered": 0,
-        "voters": 0,
-        "expressed": 0,
-        "blankInvalid": 0,
-        "values": {}
       },
       "21": {
         "name": "Cote-D'Or",
@@ -15873,6 +15925,22 @@
           "left": 40786,
           "presidential": 31589
         }
+      },
+      "2A": {
+        "name": "Corse-du-Sud",
+        "registered": 0,
+        "voters": 0,
+        "expressed": 0,
+        "blankInvalid": 0,
+        "values": {}
+      },
+      "2B": {
+        "name": "Haute-Corse",
+        "registered": 0,
+        "voters": 0,
+        "expressed": 0,
+        "blankInvalid": 0,
+        "values": {}
       }
     },
     "sourceIds": [
@@ -16052,17 +16120,6 @@
           "left": 44837,
           "center": 26271,
           "presidential": 30392
-        }
-      },
-      "20": {
-        "name": "Corse",
-        "registered": 117904,
-        "voters": 78360,
-        "expressed": 76888,
-        "blankInvalid": 1472,
-        "values": {
-          "left": 41459,
-          "presidential": 35429
         }
       },
       "21": {
@@ -17053,6 +17110,28 @@
         "values": {
           "left": 49582,
           "presidential": 25291
+        }
+      },
+      "2A": {
+        "name": "Corse-du-Sud",
+        "registered": 117904,
+        "voters": 78360,
+        "expressed": 76888,
+        "blankInvalid": 1472,
+        "values": {
+          "left": 41459,
+          "presidential": 35429
+        }
+      },
+      "2B": {
+        "name": "Haute-Corse",
+        "registered": 117904,
+        "voters": 78360,
+        "expressed": 76888,
+        "blankInvalid": 1472,
+        "values": {
+          "left": 41459,
+          "presidential": 35429
         }
       }
     },

@@ -306,6 +306,7 @@ function map2017TerritoryCode(code: string) {
     ZN: ["988"], ZP: ["987"], ZS: ["975"], ZW: ["986"], ZX: ["977", "978"]
   };
   if (mapping[code]) return mapping[code];
+  if (/^2[AB]$/.test(code)) return [code];
   if (/^\d+$/.test(code)) return [normalizeDepartmentCode(code)];
   return [];
 }

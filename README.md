@@ -4,6 +4,20 @@ HistPoliticor est une application web progressive consacrée à l'histoire des p
 
 Le projet privilégie un dataset historique local, relationnel et traçable : les partis, personnes, élections, événements, familles politiques et sources sont consultables séparément et reliés entre eux.
 
+## Captures d’écran
+
+### Accueil
+
+![Accueil dynamique de HistPoliticor](docs/screenshots/accueil.jpg)
+
+### Généalogie des partis
+
+![Arbre généalogique interactif du courant gaulliste](docs/screenshots/genealogie-gaulliste.jpg)
+
+### Carte électorale
+
+![Résultats départementaux du second tour de l’élection présidentielle de 2017](docs/screenshots/election-presidentielle-2017.jpg)
+
 ## Fonctionnalités principales
 
 - chronologie interactive générée à partir des événements, élections, partis et relations ;
